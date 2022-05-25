@@ -168,6 +168,20 @@ export function getUnreads() {
     };
 }
 
+export function setShowRHSAction(showRHSPluginAction) {
+    return {
+        type: ActionTypes.RECEIVED_SHOW_RHS_ACTION,
+        showRHSPluginAction,
+    };
+}
+
+export function updateRhsState(rhsState) {
+    return {
+        type: ActionTypes.UPDATE_RHS_STATE,
+        state: rhsState,
+    };
+}
+
 const GITLAB_USER_GET_TIMEOUT_MILLISECONDS = 1000 * 60 * 60; // 1 hour
 
 export function getGitlabUser(userID) {

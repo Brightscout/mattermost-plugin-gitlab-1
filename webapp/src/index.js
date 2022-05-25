@@ -5,13 +5,14 @@ import SidebarHeader from './components/sidebar_header';
 import TeamSidebar from './components/team_sidebar';
 import UserAttribute from './components/user_attribute';
 import Reducer from './reducers';
-import {getConnected} from './actions';
+import SidebarRight from './components/sidebar_right';
+import {getConnected,setShowRHSAction} from './actions';
 import {
     handleConnect,
     handleDisconnect,
     handleReconnect,
     handleRefresh,
-} from './websocket';
+} from './websocket';   
 import {id} from './manifest';
 import Client from './client';
 import {getPluginServerRoute} from './selectors';
@@ -32,6 +33,9 @@ class PluginClass {
         registry.registerLeftSidebarHeaderComponent(SidebarHeader);
         registry.registerBottomTeamSidebarComponent(TeamSidebar);
         registry.registerPopoverUserAttributesComponent(UserAttribute);
+
+        const {showRHSPlugin} = registry.registerRightHandSidebarComponent(SidebarRight, 'GitLab');
+        store.dispatch(setShowRHSAction(() => store.dispatch(showRHSPlugin)));
 
         registry.registerWebSocketEventHandler(
             `custom_${id}_gitlab_connect`,

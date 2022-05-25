@@ -115,6 +115,25 @@ function unreads(state = [], action) {
     }
 }
 
+function rhsPluginAction(state = null, action) {
+    switch (action.type) {
+    case ActionTypes.RECEIVED_SHOW_RHS_ACTION:
+        return action.showRHSPluginAction;
+    default:
+        return state;
+    }
+}
+
+function rhsState(state = null, action) {
+    switch (action.type) {
+    case ActionTypes.UPDATE_RHS_STATE:
+        return action.state;
+    default:
+        return state;
+    }
+}
+
+
 function gitlabUsers(state = {}, action) {
     switch (action.type) {
     case ActionTypes.RECEIVED_GITLAB_USER: {
@@ -140,4 +159,7 @@ export default combineReducers({
     mentions,
     unreads,
     gitlabUsers,
+    rhsPluginAction,
+    rhsState,
+    // yourLabelsDetails
 });
