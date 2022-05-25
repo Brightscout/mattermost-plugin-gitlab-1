@@ -16,17 +16,15 @@ import { formatTimeSince } from "../../utils/date_utils";
 
 const notificationReasons = {
   assigned: "You were assigned to the issue",
-  author: "You created the thread.",
-  comment: "You commented on the thread.",
-  invitation: "You accepted an invitation to contribute to the repository.",
-  manual: "You subscribed to the thread (via an issue or pull request).",
-  mentioned: "You were specifically @mentioned in the content.",
   review_requested: "You were requested to review a pull request.",
-  security_alert:
-    "GitHub discovered a security vulnerability in your repository.",
-  state_change: "You changed the thread state.",
-  subscribed: "You are watching the repository.",
-  team_mention: "You were on a team that was mentioned.",
+  mentioned: "You were specifically @mentioned in the content.",
+  build_failed: "Gitlab build was failed.",
+  marked: "Task is marked as done.",
+  approval_required: "Your approval is required on this issue.",
+  unmergeable: "This branch can not be merged.",
+  directly_addressed: "directly addressed.",
+  merge_train_removed: "merge train removed.",
+  attention_required: "Your attention is required on the issue.",
 };
 
 interface Label {
@@ -67,8 +65,8 @@ interface Item {
   author: User;
   references: References;
   project: Project;
-  mergeStatus: string;
-  mergeError: string;
+  merge_status: string;
+  merge_error: string;
   owner?: User;
   milestone?: {
     title: string;
@@ -93,7 +91,6 @@ interface GithubItemsProps {
 
 function GitlabItems({ items, theme }: GithubItemsProps) {
   const style = getStyle(theme);
-  // console.log(items);
   return items.length > 0 ? (
     items.map((item) => {
       let repoName = "";
@@ -116,7 +113,7 @@ function GitlabItems({ items, theme }: GithubItemsProps) {
         };
 
         let icon;
-        if (item.mergeStatus) {
+        if (item.merge_status) {
           // item is a pull request
           icon = <GitPullRequestIcon {...iconProps} />;
         } else {
@@ -160,32 +157,6 @@ function GitlabItems({ items, theme }: GithubItemsProps) {
         }
       }
 
-      // let status = null;
-      // if (item.mergeStatus) {
-      //   switch (item.mergeStatus) {
-      //     case "success":
-      //       status = (
-      //         <span style={{ ...style.icon, ...style.iconSucess }}>
-      //           <TickIcon />
-      //         </span>
-      //       );
-      //       break;
-      //     case "can_be_merged":
-      //       status = (
-      //         <span style={{ ...style.icon, ...style.iconPending }}>
-      //           <DotIcon />
-      //         </span>
-      //       );
-      //       break;
-      //     default:
-      //       status = (
-      //         <span style={{ ...style.icon, ...style.iconFailed }}>
-      //           <CrossIcon />
-      //         </span>
-      //       );
-      //   }
-      // }
-
       let milestone: JSX.Element | null = null;
       if (item.milestone) {
         milestone = (
@@ -212,10 +183,7 @@ function GitlabItems({ items, theme }: GithubItemsProps) {
       return (
         <div key={item.id} style={style.container}>
           <div>
-            <strong>
-              {title}
-              {/* {status} */}
-            </strong>
+            <strong>{title}</strong>
           </div>
           <div>
             {number}

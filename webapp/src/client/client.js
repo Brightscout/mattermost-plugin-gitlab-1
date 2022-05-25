@@ -30,10 +30,6 @@ export default class Client {
         return this.doGet(`${this.url}/unreads`);
     };
 
-    // getLabelsDetails = async (prList) => {
-    //     return this.doPost(`${this.url}/labelsdetails`, prList);
-    // }
-
     getGitlabUser = async (userID) => {
         return this.doPost(`${this.url}/user`, {user_id: userID});
     };

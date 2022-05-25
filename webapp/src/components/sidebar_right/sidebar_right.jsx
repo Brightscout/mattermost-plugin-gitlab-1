@@ -50,9 +50,9 @@ export default class SidebarRight extends React.PureComponent {
         title = "Your Open Merge Requests";
         listUrl =
           baseURL +
-          "/pulls?q=is%3Aopen+is%3Apr+author%3A" +
+          "/dashboard/merge_requests?state=opened&scope=all&author_username=" +
           this.props.username +
-          "+archived%3Afalse" +
+          "&archived=false" +
           orgQuery;
 
         break;
@@ -60,9 +60,9 @@ export default class SidebarRight extends React.PureComponent {
         gitlabItems = this.props.reviews;
         listUrl =
           baseURL +
-          "/pulls?q=is%3Aopen+is%3Apr+review-requested%3A" +
+          "/dashboard/merge_requests?state=opened&scope=all&assignee_username=" +
           this.props.username +
-          "+archived%3Afalse" +
+          "&archived=false" +
           orgQuery;
         title = "Merge Requests Needing Review";
 
@@ -70,14 +70,14 @@ export default class SidebarRight extends React.PureComponent {
       case RHSStates.UNREADS:
         gitlabItems = this.props.unreads;
         title = "Unread Messages";
-        listUrl = baseURL + "/notifications";
+        listUrl = baseURL + "/dashboard/todos";
         break;
       case RHSStates.ASSIGNMENTS:
         gitlabItems = this.props.yourAssignments;
         title = "Your Assignments";
         listUrl =
           baseURL +
-          "/pulls?q=is%3Aopen+archived%3Afalse+assignee%3A" +
+          "/dashboard/issues?state=opened&scope=all&assignee_username=" +
           this.props.username +
           orgQuery;
         break;

@@ -150,13 +150,7 @@ export default class SidebarButtons extends React.PureComponent {
             <Tooltip id="yourPrsTooltip">Your open merge requests</Tooltip>
           }
         >
-          <a
-            // href={baseURL + orgQuery + '/merge_requests?state=opened&author_username=' + this.props.username}
-            // target='_blank'
-            // rel='noopener noreferrer'
-            onClick={() => this.openRHS(RHSStates.PRS)}
-            style={button}
-          >
+          <a onClick={() => this.openRHS(RHSStates.PRS)} style={button}>
             <i className="fa fa-compress" />
             {" " + yourPrs.length}
           </a>
@@ -168,13 +162,7 @@ export default class SidebarButtons extends React.PureComponent {
             <Tooltip id="reviewTooltip">Merge requests needing review</Tooltip>
           }
         >
-          <a
-            // href={baseURL + orgQuery + '/merge_requests?reviewer_username=' + this.props.username}
-            // target='_blank'
-            // rel='noopener noreferrer'
-            onClick={() => this.openRHS(RHSStates.REVIEWS)}
-            style={button}
-          >
+          <a onClick={() => this.openRHS(RHSStates.REVIEWS)} style={button}>
             <i className="fa fa-code-fork" />
             {" " + reviews.length}
           </a>
@@ -184,13 +172,7 @@ export default class SidebarButtons extends React.PureComponent {
           placement={placement}
           overlay={<Tooltip id="reviewTooltip">Your assignments</Tooltip>}
         >
-          <a
-            // href={baseURL + orgQuery + '/issues?assignee_username=' + this.props.username}
-            // target='_blank'
-            // rel='noopener noreferrer'
-            onClick={() => this.openRHS(RHSStates.ASSIGNMENTS)}
-            style={button}
-          >
+          <a onClick={() => this.openRHS(RHSStates.ASSIGNMENTS)} style={button}>
             <i className="fa fa-list-ol" />
             {" " + yourAssignments.length}
           </a>
@@ -200,13 +182,7 @@ export default class SidebarButtons extends React.PureComponent {
           placement={placement}
           overlay={<Tooltip id="unreadsTooltip">Unread messages</Tooltip>}
         >
-          <a
-            // href={baseURL + '/dashboard/todos'}
-            // target='_blank'
-            // rel='noopener noreferrer'
-            onClick={() => this.openRHS(RHSStates.UNREADS)}
-            style={button}
-          >
+          <a onClick={() => this.openRHS(RHSStates.UNREADS)} style={button}>
             <i className="fa fa-envelope" />
             {" " + unreads.length}
           </a>
