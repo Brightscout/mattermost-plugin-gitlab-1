@@ -39,14 +39,14 @@ function mapDispatchToProps(dispatch) {
                 getUnreads,
                 getYourPrs,
                 getYourAssignments,
-                updateRhsState
+                updateRhsState,
             },
-            dispatch
+            dispatch,
         ),
     };
 }
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    mapDispatchToProps,
 )(SidebarButtons);

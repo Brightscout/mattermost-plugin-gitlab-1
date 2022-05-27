@@ -51,7 +51,7 @@ function settings(
         daily_reminder: true,
         notifications: true,
     },
-    action
+    action,
 ) {
     switch (action.type) {
     case ActionTypes.RECEIVED_CONNECTED:
@@ -133,7 +133,6 @@ function rhsState(state = null, action) {
     }
 }
 
-
 function gitlabUsers(state = {}, action) {
     switch (action.type) {
     case ActionTypes.RECEIVED_GITLAB_USER: {
@@ -161,5 +160,4 @@ export default combineReducers({
     gitlabUsers,
     rhsPluginAction,
     rhsState,
-    // yourLabelsDetails
 });

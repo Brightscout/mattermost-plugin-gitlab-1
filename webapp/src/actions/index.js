@@ -49,7 +49,7 @@ export function getReviews() {
 
         const connected = await checkAndHandleNotConnected(data)(
             dispatch,
-            getState
+            getState,
         );
         if (!connected) {
             return {error: data};
@@ -75,7 +75,7 @@ export function getYourPrs() {
 
         const connected = await checkAndHandleNotConnected(data)(
             dispatch,
-            getState
+            getState,
         );
         if (!connected) {
             return {error: data};
@@ -101,7 +101,7 @@ export function getYourAssignments() {
 
         const connected = await checkAndHandleNotConnected(data)(
             dispatch,
-            getState
+            getState,
         );
         if (!connected) {
             return {error: data};
@@ -127,7 +127,7 @@ export function getMentions() {
 
         const connected = await checkAndHandleNotConnected(data)(
             dispatch,
-            getState
+            getState,
         );
         if (!connected) {
             return {error: data};
@@ -153,7 +153,7 @@ export function getUnreads() {
 
         const connected = await checkAndHandleNotConnected(data)(
             dispatch,
-            getState
+            getState,
         );
         if (!connected) {
             return {error: data};
@@ -168,6 +168,10 @@ export function getUnreads() {
     };
 }
 
+/**
+ * Stores`showRHSPlugin` action returned by
+ * registerRightHandSidebarComponent in plugin initialization.
+ */
 export function setShowRHSAction(showRHSPluginAction) {
     return {
         type: ActionTypes.RECEIVED_SHOW_RHS_ACTION,

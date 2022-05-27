@@ -21,6 +21,7 @@ module.exports = {
                     options: {
                         cacheDirectory: true,
 
+                        // Babel configuration is in babel.config.js because jest requires it to be there.
                     },
                 },
             },

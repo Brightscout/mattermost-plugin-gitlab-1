@@ -1,30 +1,30 @@
-import React from "react";
+import React from 'react';
 import {
   makeStyleFromTheme,
   changeOpacity,
-} from "mattermost-redux/utils/theme_utils";
-import { Badge } from "react-bootstrap";
-import * as CSS from "csstype";
-import { Theme } from "mattermost-redux/types/preferences";
+} from 'mattermost-redux/utils/theme_utils';
+import { Badge, Tooltip, OverlayTrigger } from "react-bootstrap";
+import * as CSS from 'csstype';
+import { Theme } from 'mattermost-redux/types/preferences';
 import {
   GitPullRequestIcon,
   IssueOpenedIcon,
   IconProps,
-} from "@primer/octicons-react";
-import SignIcon from "../../images/icons/sign";
-import { formatTimeSince } from "../../utils/date_utils";
+} from '@primer/octicons-react';
+import SignIcon from '../../images/icons/sign';
+import { formatTimeSince } from '../../utils/date_utils';
 
 const notificationReasons = {
-  assigned: "You were assigned to the issue",
-  review_requested: "You were requested to review a pull request.",
-  mentioned: "You were specifically @mentioned in the content.",
-  build_failed: "Gitlab build was failed.",
-  marked: "Task is marked as done.",
-  approval_required: "Your approval is required on this issue.",
-  unmergeable: "This branch can not be merged.",
-  directly_addressed: "directly addressed.",
-  merge_train_removed: "merge train removed.",
-  attention_required: "Your attention is required on the issue.",
+  assigned: 'You were assigned to the issue',
+  review_requested: 'You were requested to review a pull request.',
+  mentioned: 'You were specifically @mentioned in the content.',
+  build_failed: 'Gitlab build was failed.',
+  marked: 'Task is marked as done.',
+  approval_required: 'Your approval is required on this issue.',
+  unmergeable: 'This branch can not be merged.',
+  directly_addressed: 'directly addressed.',
+  merge_train_removed: 'merge train removed.',
+  attention_required: 'Your attention is required on the issue.',
 };
 
 interface Label {
@@ -53,7 +53,7 @@ interface Target {
 interface Item {
   url: string;
   iid: number;
-
+  has_conflicts:boolean;
   id: number;
   title: string;
   created_at: string;
@@ -84,23 +84,23 @@ interface Item {
   reason?: keyof typeof notificationReasons;
 }
 
-interface GithubItemsProps {
+interface GitlabItemsProps {
   items: Item[];
   theme: Theme;
 }
 
-function GitlabItems({ items, theme }: GithubItemsProps) {
+function GitlabItems({ items, theme }: GitlabItemsProps) {
   const style = getStyle(theme);
   return items.length > 0 ? (
     items.map((item) => {
-      let repoName = "";
+      let repoName = '';
       if (item.references) {
         repoName = item.references.full;
       } else if (item.project?.path_with_namespace) {
         repoName = item.project.path_with_namespace;
       }
 
-      let userName = "";
+      let userName = '';
       if (item.author?.username) {
         userName = item.author.username;
       }
@@ -108,8 +108,8 @@ function GitlabItems({ items, theme }: GithubItemsProps) {
       let number: JSX.Element | null = null;
       if (item.iid) {
         const iconProps: IconProps = {
-          size: "small",
-          verticalAlign: "text-bottom",
+          size: 'small',
+          verticalAlign: 'text-bottom',
         };
 
         let icon;
@@ -122,12 +122,12 @@ function GitlabItems({ items, theme }: GithubItemsProps) {
         number = (
           <strong>
             <span style={{ ...style.icon }}>{icon}</span>
-            {"#" + item.iid}
+            {'#' + item.iid}
           </strong>
         );
       }
 
-      let titleText = "";
+      let titleText = '';
       if (item.title) {
         titleText = item.title;
       } else if (item.target?.title) {
@@ -139,8 +139,8 @@ function GitlabItems({ items, theme }: GithubItemsProps) {
         title = (
           <a
             href={item.web_url || item.target_url}
-            target="_blank"
-            rel="noopener noreferrer"
+            target='_blank'
+            rel='noopener noreferrer'
             style={style.itemTitle}
           >
             {titleText}
@@ -149,7 +149,7 @@ function GitlabItems({ items, theme }: GithubItemsProps) {
         if (item.iid) {
           number = (
             <strong>
-              <a href={item.web_url} target="_blank" rel="noopener noreferrer">
+              <a href={item.web_url} target='_blank' rel='noopener noreferrer'>
                 {number}
               </a>
             </strong>
@@ -177,29 +177,31 @@ function GitlabItems({ items, theme }: GithubItemsProps) {
 
       let labels: JSX.Element[] | null = null;
       if (item.labels) {
-        labels = getGithubLabels(item.labels);
+        labels = getGitlabLabels(item.labels);
       }
 
       return (
         <div key={item.id} style={style.container}>
           <div>
-            <strong>{title}</strong>
+            <strong>
+                {title}
+            </strong>
           </div>
           <div>
             {number}
-            <span className="light">{"(" + repoName + ")"}</span>
+            <span className='light'>{'(' + repoName + ')'}</span>
           </div>
           {labels}
-          <div className="light" style={style.subtitle}>
+          <div className='light' style={style.subtitle}>
             {item.created_at &&
-              "Opened " + formatTimeSince(item.created_at) + " ago"}
-            {userName && " by " + userName}
-            {(item.created_at || userName) && "."}
+              'Opened ' + formatTimeSince(item.created_at) + ' ago'}
+            {userName && ' by ' + userName}
+            {(item.created_at || userName) && '.'}
             {milestone}
             {item.action_name ? (
               <>
                 {(item.created_at || userName || milestone) && <br />}
-                {item.updated_at && formatTimeSince(item.updated_at) + " ago"}
+                {item.updated_at && formatTimeSince(item.updated_at) + ' ago'}
                 {<br />}
                 {notificationReasons[item.action_name]}
               </>
@@ -209,35 +211,35 @@ function GitlabItems({ items, theme }: GithubItemsProps) {
       );
     })
   ) : (
-    <div style={style.container}>{"You have no active items"}</div>
+    <div style={style.container}>{'You have no active items'}</div>
   );
 }
 const getStyle = makeStyleFromTheme((theme) => {
   return {
     container: {
-      padding: "15px",
+      padding: '15px',
       borderTop: `1px solid ${changeOpacity(theme.centerChannelColor, 0.2)}`,
     },
     itemTitle: {
       color: theme.centerChannelColor,
       lineHeight: 1.7,
-      fontWeight: "bold",
+      fontWeight: 'bold',
     },
     subtitle: {
-      margin: "5px 0 0 0",
-      fontSize: "13px",
+      margin: '5px 0 0 0',
+      fontSize: '13px',
     },
     subtitleSecondLine: {
-      fontSize: "13px",
+      fontSize: '13px',
     },
     icon: {
       top: 3,
-      position: "relative",
+      position: 'relative',
       left: 3,
       height: 18,
-      display: "inline-flex",
-      alignItems: "center",
-      marginRight: "6px",
+      display: 'inline-flex',
+      alignItems: 'center',
+      marginRight: '6px',
     },
     iconSucess: {
       color: theme.onlineIndicator,
@@ -256,15 +258,15 @@ const getStyle = makeStyleFromTheme((theme) => {
     },
     milestoneIcon: {
       top: 3,
-      position: "relative",
+      position: 'relative',
       height: 18,
-      display: "inline-flex",
-      alignItems: "center",
+      display: 'inline-flex',
+      alignItems: 'center',
       color: theme.centerChannelColor,
     },
   };
 });
-function getGithubLabels(labels: Label[]) {
+function getGitlabLabels(labels: Label[]) {
   return labels.map((label) => {
     return (
       <Badge
@@ -284,11 +286,11 @@ function getGithubLabels(labels: Label[]) {
 }
 
 const itemStyle: CSS.Properties = {
-  margin: "4px 5px 0 0",
-  padding: "3px 8px",
-  display: "inline-flex",
-  borderRadius: "3px",
-  position: "relative",
+  margin: '4px 5px 0 0',
+  padding: '3px 8px',
+  display: 'inline-flex',
+  borderRadius: '3px',
+  position: 'relative',
 };
 
 export default GitlabItems;
