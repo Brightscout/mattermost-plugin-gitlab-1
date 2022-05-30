@@ -10,28 +10,39 @@ import {RHSStates} from '../../constants';
 import GitlabItems from './gitlab_items.tsx';
 
 export function renderView(props) {
-    return (
-        <div
-            {...props}
-            className='scrollbar--view'
-        />);
+  return (
+    <div
+        {...props}
+        className='scrollbar--view'
+    />);
 }
 
 export function renderThumbHorizontal(props) {
     return (
-        <div
-            {...props}
-            className='scrollbar--horizontal'
-        />);
+    <div
+        {...props}
+        className='scrollbar--horizontal'
+    />);
 }
 
 export function renderThumbVertical(props) {
     return (
-        <div
-            {...props}
-            className='scrollbar--vertical'
-        />);
+    <div
+        {...props}
+        className='scrollbar--vertical'
+    />);
 }
+
+function mapGithubItemListToPrList(gilist) {
+  if (!gilist) {
+      return [];
+  }
+
+  return gilist.map((pr) => {
+      return {sha: pr.sha, project_id: pr.project_id, iid:pr.iid};
+  });
+}
+
 
 export default class SidebarRight extends React.PureComponent {
   static propTypes = {
@@ -45,7 +56,16 @@ export default class SidebarRight extends React.PureComponent {
       rhsState: PropTypes.string,
       yourLabels: PropTypes.arrayOf(PropTypes.object),
       theme: PropTypes.object.isRequired,
+      actions: PropTypes.shape({
+        getYourPrsDetails: PropTypes.func.isRequired,
+    }).isRequired,
   };
+
+  componentDidMount() {
+    if (this.props.yourPrs && this.props.rhsState === RHSStates.PRS) {
+        this.props.actions.getYourPrsDetails(mapGithubItemListToPrList(this.props.yourPrs));
+    }
+}
 
   render() {
       const baseURL = this.props.enterpriseURL ?

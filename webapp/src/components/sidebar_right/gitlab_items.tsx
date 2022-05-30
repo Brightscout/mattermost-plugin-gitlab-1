@@ -11,6 +11,10 @@ import {
   IssueOpenedIcon,
   IconProps,
 } from '@primer/octicons-react';
+
+import CrossIcon from "../../images/icons/cross";
+import DotIcon from "../../images/icons/dot";
+import TickIcon from "../../images/icons/tick";
 import SignIcon from '../../images/icons/sign';
 import { formatTimeSince } from '../../utils/date_utils';
 
@@ -52,6 +56,7 @@ interface Target {
 
 interface Item {
   url: string;
+  status:string;
   iid: number;
   has_conflicts:boolean;
   id: number;
@@ -180,11 +185,66 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
         labels = getGitlabLabels(item.labels);
       }
 
+      let hasConflict: JSX.Element | null = null;
+            if (item.has_conflicts) {
+                hasConflict = (
+                    <OverlayTrigger
+                        key="gitlabRHSPRMergeableIndicator"
+                        placement="top"
+                        overlay={
+                            <Tooltip id="gitlabRHSPRMergeableTooltip">
+                                {
+                                    "This merge request has conflicts that must be resolved"
+                                }
+                            </Tooltip>
+                        }
+                    >
+                        <i
+                            style={style.conflictIcon}
+                            className="icon icon-alert-outline"
+                        />
+                    </OverlayTrigger>
+                );
+            }
+            let status: JSX.Element | null = null;
+            if (item.status) {
+                switch (item.status) {
+                    case "success":
+                        status = (
+                            <span
+                                style={{ ...style.icon, ...style.iconSucess }}
+                            >
+                                <TickIcon />
+                            </span>
+                        );
+                        break;
+                    case "success":
+                        status = (
+                            <span
+                                style={{ ...style.icon, ...style.iconPending }}
+                            >
+                                <DotIcon />
+                            </span>
+                        );
+                        break;
+                    default:
+                        status = (
+                            <span
+                                style={{ ...style.icon, ...style.iconFailed }}
+                            >
+                                <CrossIcon />
+                            </span>
+                        );
+                }
+            }
+
       return (
         <div key={item.id} style={style.container}>
           <div>
             <strong>
                 {title}
+                {status}
+                {hasConflict}
             </strong>
           </div>
           <div>

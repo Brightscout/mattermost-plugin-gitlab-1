@@ -90,6 +90,30 @@ export function getYourPrs() {
     };
 }
 
+export function getYourPrsDetails(prList) {
+    return async (dispatch, getState) => {
+        console.log("prlist",prList)
+        let data;
+        try {
+            data = await Client.getPrsDetails(prList);
+        } catch (error) {
+            return {error};
+        }
+        console.log("data", data)
+        const connected = await checkAndHandleNotConnected(data)(dispatch, getState);
+        if (!connected) {
+            return {error: data};
+        }
+
+        dispatch({
+            type: ActionTypes.RECEIVED_YOUR_PRS_DETAILS,
+            data,
+        });
+
+        return {data};
+    };
+}
+
 export function getYourAssignments() {
     return async (dispatch, getState) => {
         let data;
