@@ -5,38 +5,40 @@ import {connect} from 'react-redux';
 
 import {bindActionCreators} from 'redux';
 
-import {getYourPrsDetails} from '../../actions';
+import {getYourPrsDetails, getReviewsDetails} from '../../actions';
 import {id as pluginId} from '../../manifest';
 
 import SidebarRight from './sidebar_right.jsx';
 
 function mapPrsToDetails(prs, details) {
-  if (!prs) {
-      return [];
-  }
+    if (!prs) {
+        return [];
+    }
 
-  return prs.map((pr) => {
-      let foundDetails;
-      if (details) {
-          foundDetails = details.find((prDetails) => {
-              return (pr.project_id === prDetails.project_id) && (pr.sha === prDetails.id);
-          });
-      }
-      if (!foundDetails) {
-          return pr;
-      }
+    return prs.map((pr) => {
+        let foundDetails;
+        if (details) {
+            foundDetails = details.find((prDetails) => {
+                return (pr.project_id === prDetails.project_id) && (pr.sha === prDetails.sha);
+            });
+        }
+        if (!foundDetails) {
+            return pr;
+        }
 
-      return {
-          ...pr,
-          status: foundDetails.status,
-      };
-  });
+        return {
+            ...pr,
+            status: foundDetails.status,
+            approvers: foundDetails.approvers,
+            total_reviewers: pr.reviewers.length,
+        };
+    });
 }
 
 function mapStateToProps(state) {
     return {
         username: state[`plugins-${pluginId}`].username,
-        reviews: state[`plugins-${pluginId}`].reviews,
+        reviews: mapPrsToDetails(state[`plugins-${pluginId}`].yourPrs, state[`plugins-${pluginId}`].reviewsDetails),
         yourPrs: mapPrsToDetails(state[`plugins-${pluginId}`].yourPrs, state[`plugins-${pluginId}`].yourPrsDetails),
         yourAssignments: state[`plugins-${pluginId}`].yourAssignments,
         unreads: state[`plugins-${pluginId}`].unreads,
@@ -46,13 +48,13 @@ function mapStateToProps(state) {
     };
 }
 
-
 function mapDispatchToProps(dispatch) {
-  return {
-      actions: bindActionCreators({
-          getYourPrsDetails,
-      }, dispatch),
-  };
+    return {
+        actions: bindActionCreators({
+            getYourPrsDetails,
+            getReviewsDetails,
+        }, dispatch),
+    };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SidebarRight);

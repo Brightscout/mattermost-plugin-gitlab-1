@@ -10,39 +10,64 @@ import {RHSStates} from '../../constants';
 import GitlabItems from './gitlab_items.tsx';
 
 export function renderView(props) {
-  return (
-    <div
-        {...props}
-        className='scrollbar--view'
-    />);
+    return (
+        <div
+            {...props}
+            className='scrollbar--view'
+        />);
 }
 
 export function renderThumbHorizontal(props) {
     return (
-    <div
-        {...props}
-        className='scrollbar--horizontal'
-    />);
+        <div
+            {...props}
+            className='scrollbar--horizontal'
+        />);
 }
 
 export function renderThumbVertical(props) {
     return (
-    <div
-        {...props}
-        className='scrollbar--vertical'
-    />);
+        <div
+            {...props}
+            className='scrollbar--vertical'
+        />);
 }
 
 function mapGithubItemListToPrList(gilist) {
-  if (!gilist) {
-      return [];
-  }
+    if (!gilist) {
+        return [];
+    }
 
-  return gilist.map((pr) => {
-      return {sha: pr.sha, project_id: pr.project_id, iid:pr.iid};
-  });
+    return gilist.map((pr) => {
+        return {sha: pr.sha, project_id: pr.project_id, iid: pr.iid};
+    });
 }
 
+function shouldUpdateDetails(
+    prs,
+    prevPrs,
+    targetState,
+    currentState,
+    prevState,
+) {
+    if (currentState === targetState) {
+        if (currentState !== prevState) {
+            return true;
+        }
+
+        if (prs.length !== prevPrs.length) {
+            return true;
+        }
+
+        for (let i = 0; i < prs.length; i++) {
+            if (prs[i].id !== prevPrs[i].id) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
 
 export default class SidebarRight extends React.PureComponent {
   static propTypes = {
@@ -57,15 +82,53 @@ export default class SidebarRight extends React.PureComponent {
       yourLabels: PropTypes.arrayOf(PropTypes.object),
       theme: PropTypes.object.isRequired,
       actions: PropTypes.shape({
-        getYourPrsDetails: PropTypes.func.isRequired,
-    }).isRequired,
+          getYourPrsDetails: PropTypes.func.isRequired,
+          getReviewsDetails: PropTypes.func.isRequired,
+      }).isRequired,
   };
 
   componentDidMount() {
-    if (this.props.yourPrs && this.props.rhsState === RHSStates.PRS) {
-        this.props.actions.getYourPrsDetails(mapGithubItemListToPrList(this.props.yourPrs));
-    }
-}
+      if (this.props.yourPrs && this.props.rhsState === RHSStates.PRS) {
+          this.props.actions.getYourPrsDetails(
+              mapGithubItemListToPrList(this.props.yourPrs),
+          );
+      }
+      if (this.props.reviews && this.props.rhsState === RHSStates.REVIEWS) {
+          this.props.actions.getReviewsDetails(
+              mapGithubItemListToPrList(this.props.reviews),
+          );
+      }
+  }
+
+  componentDidUpdate(prevProps) {
+      if (
+          shouldUpdateDetails(
+              this.props.yourPrs,
+              prevProps.yourPrs,
+              RHSStates.PRS,
+              this.props.rhsState,
+              prevProps.rhsState,
+          )
+      ) {
+          this.props.actions.getYourPrsDetails(
+              mapGithubItemListToPrList(this.props.yourPrs),
+          );
+      }
+
+      if (
+          shouldUpdateDetails(
+              this.props.reviews,
+              prevProps.reviews,
+              RHSStates.REVIEWS,
+              this.props.rhsState,
+              prevProps.rhsState,
+          )
+      ) {
+          this.props.actions.getReviewsDetails(
+              mapGithubItemListToPrList(this.props.reviews),
+          );
+      }
+  }
 
   render() {
       const baseURL = this.props.enterpriseURL ?

@@ -58,6 +58,7 @@ interface Item {
   url: string;
   status:string;
   iid: number;
+  total_reviewers:number;
   has_conflicts:boolean;
   id: number;
   title: string;
@@ -80,7 +81,7 @@ interface Item {
     full_name: string;
   };
   labels?: Label[];
-
+  approvers: number;
   Notifications;
   target: Target;
   subject?: {
@@ -237,6 +238,18 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
                         );
                 }
             }
+        
+      const reviews = (
+        <div style={style.subtitle}>
+            <span className="light">
+                {item.approvers +
+                    " out of " +
+                    item.total_reviewers+
+                    " " + (item.total_reviewers>1?"reviews":"review") +
+                    " complete."}
+            </span>
+        </div>
+      )
 
       return (
         <div key={item.id} style={style.container}>
@@ -267,6 +280,7 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
               </>
             ) : null}
           </div>
+          {item.total_reviewers>0 && reviews}
         </div>
       );
     })

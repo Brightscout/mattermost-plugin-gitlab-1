@@ -79,6 +79,15 @@ function reviews(state = [], action) {
     }
 }
 
+function reviewsDetails(state = [], action) {
+    switch (action.type) {
+    case ActionTypes.RECEIVED_REVIEWS_DETAILS:
+        return action.data;
+    default:
+        return state;
+    }
+}
+
 function yourPrs(state = [], action) {
     switch (action.type) {
     case ActionTypes.RECEIVED_YOUR_PRS:
@@ -169,5 +178,6 @@ export default combineReducers({
     gitlabUsers,
     rhsPluginAction,
     rhsState,
-    yourPrsDetails
+    yourPrsDetails,
+    reviewsDetails,
 });
