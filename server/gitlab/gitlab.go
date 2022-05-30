@@ -26,6 +26,7 @@ type Gitlab interface {
 	GetProject(ctx context.Context, user *UserInfo, owner, repo string) (*internGitlab.Project, error)
 	GetReviews(ctx context.Context, user *UserInfo) ([]*internGitlab.MergeRequest, error)
 	GetYourPrs(ctx context.Context, user *UserInfo) ([]*internGitlab.MergeRequest, error)
+	GetYourPrDetails(ctx context.Context, user *UserInfo, prList []*PRDetails) ([]*PRDetails, error)
 	GetYourAssignments(ctx context.Context, user *UserInfo) ([]*internGitlab.Issue, error)
 	GetUnreads(ctx context.Context, user *UserInfo) ([]*internGitlab.Todo, error)
 	GetProjectHooks(ctx context.Context, user *UserInfo, owner string, repo string) ([]*WebhookInfo, error)
@@ -35,7 +36,7 @@ type Gitlab interface {
 	// ResolveNamespaceAndProject accepts full path to User, Group or namespaced Project and returns corresponding
 	// namespace and project name.
 	//
-	// ErrNotFound will be returned if no resource can be found.
+	// ErrNotFound wil	l be returned if no resource can be found.
 	// If allowPrivate is set to false, and resolved group/project is private, ErrPrivateResource will be returned.
 	ResolveNamespaceAndProject(
 		ctx context.Context,
