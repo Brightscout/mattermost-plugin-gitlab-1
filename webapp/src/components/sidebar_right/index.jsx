@@ -20,4 +20,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, null)(SidebarRight);
+export default connect(mapStateToProps)(SidebarRight);
