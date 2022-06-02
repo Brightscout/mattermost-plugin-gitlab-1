@@ -48,7 +48,6 @@ function mapStateToProps(state) {
     };
 }
 
-<<<<<<< HEAD
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({
@@ -59,6 +58,3 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SidebarRight);
-=======
-export default connect(mapStateToProps)(SidebarRight);
->>>>>>> 2863e15f39f16217924de067368db630c2446701
