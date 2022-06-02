@@ -12,4 +12,8 @@ export default {
     RECEIVED_GITLAB_USER: `${id}_received_gitlab_user`,
     RECEIVED_SHOW_RHS_ACTION: `${id}_received_rhs_action`,
     UPDATE_RHS_STATE: `${id}_update_rhs_state`,
+    OPEN_CREATE_ISSUE_MODAL: `${id}_open_create_modal`,
+    OPEN_CREATE_ISSUE_MODAL_WITHOUT_POST: `${id}_open_create_modal_without_post`,
+    CLOSE_CREATE_ISSUE_MODAL: `${id}_close_create_modal`,
+    RECEIVED_REPOSITORIES: `${id}_received_repositories`,
 };

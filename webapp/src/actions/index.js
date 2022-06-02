@@ -275,3 +275,69 @@ export function getGitlabUser(userID) {
         return {data};
     };
 }
+
+export function openCreateIssueModal(postId) {
+    return {
+        type: ActionTypes.OPEN_CREATE_ISSUE_MODAL,
+        data: {
+            postId,
+        },
+    };
+}
+
+export function openCreateIssueModalWithoutPost(title, channelId) {
+    return {
+        type: ActionTypes.OPEN_CREATE_ISSUE_MODAL_WITHOUT_POST,
+        data: {
+            title,
+            channelId,
+        },
+    };
+}
+
+export function closeCreateIssueModal() {
+    return {
+        type: ActionTypes.CLOSE_CREATE_ISSUE_MODAL,
+    };
+}
+
+export function createIssue(payload) {
+    return async (dispatch) => {
+        let data;
+        // try {
+        //     data = await Client.createIssue(payload);
+        // } catch (error) {
+        //     return {error};
+        // }
+
+        // const connected = await dispatch(checkAndHandleNotConnected(data));
+        // if (!connected) {
+        //     return {error: data};
+        // }
+
+        return {data};
+    };
+}
+
+export function getRepos() {
+    return async (dispatch, getState) => {
+        let data;
+        try {
+            data = await Client.getRepositories();
+        } catch (error) {
+            return {error: data};
+        }
+
+        const connected = await checkAndHandleNotConnected(data)(dispatch, getState);
+        if (!connected) {
+            return {error: data};
+        }
+
+        dispatch({
+            type: ActionTypes.RECEIVED_REPOSITORIES,
+            data,
+        });
+
+        return {data};
+    };
+}

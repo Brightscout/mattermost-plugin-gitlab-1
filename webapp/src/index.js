@@ -6,6 +6,8 @@ import TeamSidebar from './components/team_sidebar';
 import UserAttribute from './components/user_attribute';
 import Reducer from './reducers';
 import SidebarRight from './components/sidebar_right';
+import CreateIssuePostMenuAction from './components/create_issue_menu';
+import CreateIssueModal from './components/modals/create_issue';
 import {getConnected, setShowRHSAction} from './actions';
 import {
     handleConnect,
@@ -33,8 +35,10 @@ class PluginClass {
         registry.registerLeftSidebarHeaderComponent(SidebarHeader);
         registry.registerBottomTeamSidebarComponent(TeamSidebar);
         registry.registerPopoverUserAttributesComponent(UserAttribute);
+        registry.registerRootComponent(CreateIssueModal);
+        registry.registerPostDropdownMenuComponent(CreateIssuePostMenuAction);
 
-        const {showRHSPlugin} = registry.registerRightHandSidebarComponent(SidebarRight, 'GitLab');
+        const {showRHSPlugin} = registry.registerRightHandSidebarComponent(SidebarRight, 'GitLab Plugin');
         store.dispatch(setShowRHSAction(() => store.dispatch(showRHSPlugin)));
 
         registry.registerWebSocketEventHandler(

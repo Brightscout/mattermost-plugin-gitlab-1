@@ -38,6 +38,10 @@ export default class Client {
         return this.doPost(`${this.url}/user`, {user_id: userID});
     };
 
+    getRepositories = async () => {
+        return this.doGet(`${this.url}/repositories`);
+    }
+
     doGet = async (url, body, headers = {}) => {
         headers['X-Timezone-Offset'] = new Date().getTimezoneOffset();
 

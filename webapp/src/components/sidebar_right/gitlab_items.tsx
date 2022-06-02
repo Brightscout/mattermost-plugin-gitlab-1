@@ -3,9 +3,9 @@ import {
   makeStyleFromTheme,
   changeOpacity,
 } from 'mattermost-redux/utils/theme_utils';
-import { Badge, Tooltip, OverlayTrigger } from "react-bootstrap";
 import * as CSS from 'csstype';
 import { Theme } from 'mattermost-redux/types/preferences';
+import { Badge, Tooltip, OverlayTrigger } from "react-bootstrap";
 import {
   GitPullRequestIcon,
   IssueOpenedIcon,
@@ -64,7 +64,7 @@ interface Item {
   title: string;
   created_at: string;
   updated_at: string;
-  action_name: string;
+  action_name: keyof typeof notificationReasons;
   web_url: string;
   target_url: string;
   repository_url?: string;
@@ -82,12 +82,7 @@ interface Item {
   };
   labels?: Label[];
   approvers: number;
-  Notifications;
   target: Target;
-  subject?: {
-    title: string;
-  };
-  reason?: keyof typeof notificationReasons;
 }
 
 interface GitlabItemsProps {
@@ -348,8 +343,8 @@ function getGitlabLabels(labels: Label[]) {
         style={{
           ...itemStyle,
           ...{
-            backgroundColor: label.color,
-            color: label.text_color,
+            backgroundColor: `${label.color}`,
+            color: `${label.text_color}`,
           },
         }}
       >

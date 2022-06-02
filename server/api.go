@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	internGitlab "github.com/xanzy/go-gitlab"
+
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -54,8 +56,10 @@ func (p *Plugin) initializeAPI() {
 	apiRouter.HandleFunc("/reviews", p.checkAuth(p.attachUserContext(p.getReviews), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/yourprs", p.checkAuth(p.attachUserContext(p.getYourPrs), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/prsdetails", p.checkAuth(p.attachUserContext(p.getPrDetails), ResponseTypePlain)).Methods(http.MethodPost)
+	apiRouter.HandleFunc("/createissue", p.checkAuth(p.attachUserContext(p.createIssue), ResponseTypePlain)).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/yourassignments", p.checkAuth(p.attachUserContext(p.getYourAssignments), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/unreads", p.checkAuth(p.attachUserContext(p.getUnreads), ResponseTypePlain)).Methods(http.MethodGet)
+	apiRouter.HandleFunc("/repositories", p.checkAuth(p.attachUserContext(p.getYourRespos), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/settings", p.checkAuth(p.attachUserContext(p.updateSettings), ResponseTypePlain)).Methods(http.MethodPost)
 }
 
@@ -564,11 +568,39 @@ func (p *Plugin) getPrDetails(c *UserContext, w http.ResponseWriter, r *http.Req
 	p.writeAPIResponse(w, result)
 }
 
+func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Request) {
+	var issue *internGitlab.Issue
+	if err := json.NewDecoder(r.Body).Decode(&issue); err != nil {
+		c.Log.WithError(err).Warnf("Error decoding create issue JSON body")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Please provide a JSON object.", StatusCode: http.StatusBadRequest})
+		return
+	}
+	result, err := p.GitlabClient.CreateIssue(c.Ctx, c.GitlabInfo, issue)
+	if err != nil {
+		c.Log.WithError(err).Warnf("Can't list create issue in GitLab API")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to create issue in GitLab API.", StatusCode: http.StatusInternalServerError})
+		return
+	}
+
+	p.writeAPIResponse(w, result)
+}
+
 func (p *Plugin) getYourAssignments(c *UserContext, w http.ResponseWriter, r *http.Request) {
 	result, err := p.GitlabClient.GetYourAssignments(c.Ctx, c.GitlabInfo)
 	if err != nil {
 		c.Log.WithError(err).Warnf("Unable to list issue where assignee in GitLab API")
 		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to list issue in GitLab API.", StatusCode: http.StatusInternalServerError})
+		return
+	}
+
+	p.writeAPIResponse(w, result)
+}
+
+func (p *Plugin) getYourRespos(c *UserContext, w http.ResponseWriter, r *http.Request) {
+	result, err := p.GitlabClient.GetYourRepos(c.Ctx, c.GitlabInfo)
+	if err != nil {
+		c.Log.WithError(err).Warnf("Can't list repos where author in GitLab API")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to list repos in GitLab API.", StatusCode: http.StatusInternalServerError})
 		return
 	}
 

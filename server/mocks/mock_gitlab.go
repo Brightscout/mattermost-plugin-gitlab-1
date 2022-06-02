@@ -36,6 +36,21 @@ func (m *MockGitlab) EXPECT() *MockGitlabMockRecorder {
 	return m.recorder
 }
 
+// CreateIssue mocks base method
+func (m *MockGitlab) CreateIssue(arg0 context.Context, arg1 *gitlab.UserInfo, arg2 *go_gitlab.Issue) (*go_gitlab.Issue, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateIssue", arg0, arg1, arg2)
+	ret0, _ := ret[0].(*go_gitlab.Issue)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateIssue indicates an expected call of CreateIssue
+func (mr *MockGitlabMockRecorder) CreateIssue(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIssue", reflect.TypeOf((*MockGitlab)(nil).CreateIssue), arg0, arg1, arg2)
+}
+
 // GetCurrentUser mocks base method
 func (m *MockGitlab) GetCurrentUser(arg0 context.Context, arg1 string, arg2 oauth2.Token) (*gitlab.UserInfo, error) {
 	m.ctrl.T.Helper()
@@ -184,6 +199,21 @@ func (m *MockGitlab) GetYourPrs(arg0 context.Context, arg1 *gitlab.UserInfo) ([]
 func (mr *MockGitlabMockRecorder) GetYourPrs(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetYourPrs", reflect.TypeOf((*MockGitlab)(nil).GetYourPrs), arg0, arg1)
+}
+
+// GetYourRepos mocks base method
+func (m *MockGitlab) GetYourRepos(arg0 context.Context, arg1 *gitlab.UserInfo) ([]*go_gitlab.Project, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetYourRepos", arg0, arg1)
+	ret0, _ := ret[0].([]*go_gitlab.Project)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetYourRepos indicates an expected call of GetYourRepos
+func (mr *MockGitlabMockRecorder) GetYourRepos(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetYourRepos", reflect.TypeOf((*MockGitlab)(nil).GetYourRepos), arg0, arg1)
 }
 
 // NewGroupHook mocks base method

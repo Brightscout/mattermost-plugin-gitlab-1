@@ -248,6 +248,31 @@ func (g *gitlab) GetProject(ctx context.Context, user *UserInfo, owner, repo str
 	return result, nil
 }
 
+func (g *gitlab) GetYourRepos(ctx context.Context, user *UserInfo) ([]*internGitlab.Project, error) {
+	client, err := g.gitlabConnect(*user.Token)
+	if err != nil {
+		return nil, err
+	}
+	owned := true
+	simple := true
+
+	result, resp, err := client.Projects.ListProjects(
+		&internGitlab.ListProjectsOptions{
+			Owned:  &owned,
+			Simple: &simple,
+		},
+		internGitlab.WithContext(ctx),
+	)
+	if respErr := checkResponse(resp); respErr != nil {
+		return nil, respErr
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (g *gitlab) GetReviews(ctx context.Context, user *UserInfo) ([]*internGitlab.MergeRequest, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
@@ -460,6 +485,30 @@ func (g *gitlab) GetUnreads(ctx context.Context, user *UserInfo) ([]*internGitla
 	}
 
 	return notifications, nil
+}
+
+func (g *gitlab) CreateIssue(ctx context.Context, user *UserInfo, issue *internGitlab.Issue) (*internGitlab.Issue, error) {
+	client, err := g.gitlabConnect(*user.Token)
+	if err != nil {
+		return nil, err
+	}
+	var pid interface{} = issue.ID
+	result, resp, err := client.Issues.CreateIssue(
+		pid,
+		&internGitlab.CreateIssueOptions{
+			Title:       &issue.Title,
+			Description: &issue.Description,
+			MilestoneID: &issue.Milestone.ID,
+		},
+		internGitlab.WithContext(ctx),
+	)
+	if respErr := checkResponse(resp); respErr != nil {
+		return nil, respErr
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "can't create issue in GitLab api")
+	}
+	return result, nil
 }
 
 type LabelId struct {
