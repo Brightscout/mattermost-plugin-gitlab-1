@@ -2,79 +2,10 @@ import React from 'react';
 import {makeStyleFromTheme, changeOpacity} from 'mattermost-redux/utils/theme_utils';
 import {Badge} from "react-bootstrap";
 import * as CSS from 'csstype';
-import {Theme} from 'mattermost-redux/types/preferences';
 import {GitPullRequestIcon, IssueOpenedIcon, IconProps} from '@primer/octicons-react';
 import SignIcon from '../../images/icons/sign';
 import {formatTimeSince} from '../../utils/date_utils';
-
-const notificationReasons: Record<string, string> = {
-  assigned: 'You were assigned to the issue',
-  review_requested: 'You were requested to review a merge request.',
-  mentioned: 'You were specifically @mentioned in the content.',
-  build_failed: 'Gitlab build was failed.',
-  marked: 'Task is marked as done.',
-  approval_required: 'Your approval is required on this issue.',
-  unmergeable: 'This merge request can not be merged.',
-  directly_addressed: 'You were directly addressed.',
-  merge_train_removed: 'A merge train was removed.',
-  attention_required: 'Your attention is required on the issue.',
-};
-
-interface Label {
-  id: number;
-  name: string;
-  color: CSS.Properties;
-  text_color: CSS.Properties;
-}
-
-interface User {
-  username: string;
-}
-
-interface References {
-  full: string;
-}
-
-interface Project {
-  path_with_namespace: string;
-}
-
-interface Target {
-  title: string;
-}
-
-interface Item {
-  url: string;
-  iid: number;
-  has_conflicts:boolean;
-  id: number;
-  title: string;
-  created_at: string;
-  updated_at: string;
-  action_name: keyof typeof notificationReasons;
-  web_url: string;
-  target_url: string;
-  repository_url?: string;
-  author: User;
-  references: References;
-  project: Project;
-  merge_status: string;
-  merge_error: string;
-  owner?: User;
-  milestone?: {
-    title: string;
-  };
-  repository?: {
-    full_name: string;
-  };
-  labels?: Label[];
-  target: Target;
-}
-
-interface GitlabItemsProps {
-  items: Item[];
-  theme: Theme;
-}
+import {GitlabItemsProps, Label, notificationReasons} from "../../types/gitlab_items"
 
 function GitlabItems({ items, theme }: GitlabItemsProps) {
   const style = getStyle(theme);
@@ -161,7 +92,7 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
           {labels}
           <div className='light' style={style.subtitle}>
           {item.created_at &&
-              `Opened ${formatTimeSince(item.created_at)} ago ${userName && ` by ${userName}`}${(item.created_at || userName) && '.'}`}
+              `Opened ${formatTimeSince(item.created_at)} ago ${userName && ` by ${userName}.`}`}
             {milestone}
             {item.action_name ? (
               <>
@@ -197,15 +128,13 @@ const getStyle = makeStyleFromTheme((theme) => {
       fontSize: '13px',
     },
     icon: {
-      top: 3,
+      top: '3px',
       position: 'relative',
-      left: 3,
-      height: 18,
       display: 'inline-flex',
       alignItems: 'center',
       marginRight: '6px',
     },
-    iconSucess: {
+    iconSucsess: {
       color: theme.onlineIndicator,
     },
     iconPending: {
@@ -221,11 +150,6 @@ const getStyle = makeStyleFromTheme((theme) => {
       color: theme.dndIndicator,
     },
     milestoneIcon: {
-      top: 3,
-      position: 'relative',
-      height: 18,
-      display: 'inline-flex',
-      alignItems: 'center',
       color: theme.centerChannelColor,
     },
   };
