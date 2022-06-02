@@ -134,7 +134,7 @@ export default class SidebarRight extends React.PureComponent {
       const baseURL = this.props.enterpriseURL ?
           this.props.enterpriseURL :
           'https://gitlab.com';
-      const orgQuery = this.props.org ? '+org%3A' + this.props.org : '';
+      const orgQuery = this.props.org ? `+org%3A ${this.props.org}` : '';
 
       let title = '';
       let gitlabItems = [];

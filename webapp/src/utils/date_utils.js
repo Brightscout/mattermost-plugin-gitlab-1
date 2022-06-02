@@ -28,34 +28,22 @@ export function formatDate(date, useMilitaryTime = false) {
         minutes = '0' + minutes;
     }
 
-    return monthNames[monthIndex] + ' ' + day + ' at ' + hours + ':' + minutes + ampm;
+    return `${monthNames[monthIndex]} ${day} at ${hours}:${minutes}${ampm}`;
 }
 
 export function formatTimeSince(date) {
     const secondsSince = Math.trunc((Date.now() - (new Date(date)).getTime()) / 1000);
     if (secondsSince < 60) {
-        if (secondsSince === 1) {
-            return secondsSince + ' second';
-        }
-        return secondsSince + ' seconds';
+        return `${secondsSince} ${secondsSince === 1 ? ' second' : ' seconds'}`
     }
     const minutesSince = Math.trunc(secondsSince / 60);
     if (minutesSince < 60) {
-        if (minutesSince === 1) {
-            return minutesSince + ' minute';
-        }
-        return minutesSince + ' minutes';
+        return `${minutesSince} ${minutesSince === 1 ? ' minute' : ' minutes'}`
     }
     const hoursSince = Math.trunc(minutesSince / 60);
     if (hoursSince < 24) {
-        if (hoursSince === 1) {
-            return hoursSince + ' hour';
-        }
-        return hoursSince + ' hours';
+        return `${hoursSince} ${hoursSince === 1 ? ' huor' : ' hourss'}`
     }
     const daysSince = Math.trunc(hoursSince / 24);
-    if (daysSince === 1) {
-        return daysSince + ' day';
-    }
-    return daysSince + ' days';
+    return `${daysSince} ${daysSince === 1 ? ' day' : ' days'}`
 }

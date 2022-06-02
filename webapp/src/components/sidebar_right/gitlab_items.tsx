@@ -20,7 +20,7 @@ import { formatTimeSince } from '../../utils/date_utils';
 
 const notificationReasons = {
   assigned: 'You were assigned to the issue',
-  review_requested: 'You were requested to review a pull request.',
+  review_requested: 'You were requested to review a merge request.',
   mentioned: 'You were specifically @mentioned in the content.',
   build_failed: 'Gitlab build was failed.',
   marked: 'Task is marked as done.',
@@ -92,7 +92,7 @@ interface GitlabItemsProps {
 
 function GitlabItems({ items, theme }: GitlabItemsProps) {
   const style = getStyle(theme);
-  return items.length > 0 ? (
+  return items.length ? (
     items.map((item) => {
       let repoName = '';
       if (item.references) {
@@ -115,15 +115,14 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
 
         let icon;
         if (item.merge_status) {
-          // item is a pull request
-          icon = <GitPullRequestIcon {...iconProps} />;
+          icon = <GitPullRequestIcon {...iconProps} />; // item is a pull request
         } else {
           icon = <IssueOpenedIcon {...iconProps} />;
         }
         number = (
           <strong>
             <span style={{ ...style.icon }}>{icon}</span>
-            {'#' + item.iid}
+            {`#${item.iid}`}
           </strong>
         );
       }
@@ -214,7 +213,7 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
                             </span>
                         );
                         break;
-                    case "success":
+                    case "pending":
                         status = (
                             <span
                                 style={{ ...style.icon, ...style.iconPending }}
@@ -237,11 +236,7 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
       const reviews = (
         <div style={style.subtitle}>
             <span className="light">
-                {item.approvers +
-                    " out of " +
-                    item.total_reviewers+
-                    " " + (item.total_reviewers>1?"reviews":"review") +
-                    " complete."}
+                {`${item.approvers}  out of ${item.total_reviewers} ${(item.total_reviewers>1?"reviews":"review")} complete.`}
             </span>
         </div>
       )
@@ -257,19 +252,17 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
           </div>
           <div>
             {number}
-            <span className='light'>{'(' + repoName + ')'}</span>
+            <span className='light'>{`(${repoName})`}</span>
           </div>
           {labels}
           <div className='light' style={style.subtitle}>
-            {item.created_at &&
-              'Opened ' + formatTimeSince(item.created_at) + ' ago'}
-            {userName && ' by ' + userName}
-            {(item.created_at || userName) && '.'}
+          {item.created_at &&
+              `Opened ${formatTimeSince(item.created_at)} ago ${userName && ` by ${userName}`}${(item.created_at || userName) && '.'}`}
             {milestone}
             {item.action_name ? (
               <>
                 {(item.created_at || userName || milestone) && <br />}
-                {item.updated_at && formatTimeSince(item.updated_at) + ' ago'}
+                {item.updated_at && `${formatTimeSince(item.updated_at)} ago`}
                 {<br />}
                 {notificationReasons[item.action_name]}
               </>
@@ -283,6 +276,7 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
     <div style={style.container}>{'You have no active items'}</div>
   );
 }
+
 const getStyle = makeStyleFromTheme((theme) => {
   return {
     container: {
@@ -335,7 +329,8 @@ const getStyle = makeStyleFromTheme((theme) => {
     },
   };
 });
-function getGitlabLabels(labels: Label[]) {
+
+const getGitlabLabels = (labels: Label[])=>{
   return labels.map((label) => {
     return (
       <Badge
