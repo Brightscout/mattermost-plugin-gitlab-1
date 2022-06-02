@@ -34,7 +34,7 @@ class PluginClass {
         registry.registerBottomTeamSidebarComponent(TeamSidebar);
         registry.registerPopoverUserAttributesComponent(UserAttribute);
 
-        const {showRHSPlugin} = registry.registerRightHandSidebarComponent(SidebarRight, 'GitLab');
+        const {showRHSPlugin} = registry.registerRightHandSidebarComponent(SidebarRight, 'GitLab Plugin');
         store.dispatch(setShowRHSAction(() => store.dispatch(showRHSPlugin)));
 
         registry.registerWebSocketEventHandler(

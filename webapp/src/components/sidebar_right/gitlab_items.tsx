@@ -64,7 +64,7 @@ interface Item {
   title: string;
   created_at: string;
   updated_at: string;
-  action_name: string;
+  action_name: keyof typeof notificationReasons;
   web_url: string;
   target_url: string;
   repository_url?: string;
@@ -82,12 +82,7 @@ interface Item {
   };
   labels?: Label[];
   approvers: number;
-  Notifications;
   target: Target;
-  subject?: {
-    title: string;
-  };
-  reason?: keyof typeof notificationReasons;
 }
 
 interface GitlabItemsProps {
@@ -288,6 +283,7 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
     <div style={style.container}>{'You have no active items'}</div>
   );
 }
+
 const getStyle = makeStyleFromTheme((theme) => {
   return {
     container: {
@@ -340,7 +336,8 @@ const getStyle = makeStyleFromTheme((theme) => {
     },
   };
 });
-function getGitlabLabels(labels: Label[]) {
+
+const getGitlabLabels = (labels: Label[])=>{
   return labels.map((label) => {
     return (
       <Badge
@@ -348,8 +345,8 @@ function getGitlabLabels(labels: Label[]) {
         style={{
           ...itemStyle,
           ...{
-            backgroundColor: label.color,
-            color: label.text_color,
+            backgroundColor: `${label.color}`,
+            color: `${label.text_color}`,
           },
         }}
       >
