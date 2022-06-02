@@ -169,8 +169,8 @@ export function getUnreads() {
 }
 
 /**
- * Stores`showRHSPlugin` action returned by
- * registerRightHandSidebarComponent in plugin initialization.
+ * Stores "showRHSPlugin" action returned by
+ * "registerRightHandSidebarComponent" in plugin initialization.
  */
 export function setShowRHSAction(showRHSPluginAction) {
     return {

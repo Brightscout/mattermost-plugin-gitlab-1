@@ -30,6 +30,7 @@ const config = {
         '@babel/proposal-object-rest-spread',
         '@babel/plugin-proposal-optional-chaining',
         'babel-plugin-typescript-to-proptypes',
+        '@babel/plugin-proposal-nullish-coalescing-operator',
     ],
 };
 
