@@ -131,9 +131,7 @@ export default class SidebarRight extends React.PureComponent {
   }
 
   render() {
-      const baseURL = this.props.enterpriseURL ?
-          this.props.enterpriseURL :
-          'https://gitlab.com';
+      const baseURL = this.props.enterpriseURL ?? 'https://gitlab.com';
       const orgQuery = this.props.org ? `+org%3A ${this.props.org}` : '';
 
       let title = '';
@@ -150,7 +148,6 @@ export default class SidebarRight extends React.PureComponent {
           this.props.username +
           '&archived=false' +
           orgQuery;
-
           break;
       case RHSStates.REVIEWS:
           gitlabItems = this.props.reviews;
@@ -161,7 +158,6 @@ export default class SidebarRight extends React.PureComponent {
           '&archived=false' +
           orgQuery;
           title = 'Merge Requests Needing Review';
-
           break;
       case RHSStates.UNREADS:
           gitlabItems = this.props.unreads;
@@ -180,6 +176,7 @@ export default class SidebarRight extends React.PureComponent {
       default:
           break;
       }
+
       return (
           <React.Fragment>
               <Scrollbars

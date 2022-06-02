@@ -1,33 +1,25 @@
 import React from 'react';
-import {
-  makeStyleFromTheme,
-  changeOpacity,
-} from 'mattermost-redux/utils/theme_utils';
+import {GitPullRequestIcon, IssueOpenedIcon, IconProps} from '@primer/octicons-react';
+import {makeStyleFromTheme, changeOpacity} from 'mattermost-redux/utils/theme_utils';
+import {Badge, Tooltip, OverlayTrigger} from "react-bootstrap";
 import * as CSS from 'csstype';
-import { Theme } from 'mattermost-redux/types/preferences';
-import { Badge, Tooltip, OverlayTrigger } from "react-bootstrap";
-import {
-  GitPullRequestIcon,
-  IssueOpenedIcon,
-  IconProps,
-} from '@primer/octicons-react';
-
+import {Theme} from 'mattermost-redux/types/preferences';
+import SignIcon from '../../images/icons/sign';
 import CrossIcon from "../../images/icons/cross";
 import DotIcon from "../../images/icons/dot";
 import TickIcon from "../../images/icons/tick";
-import SignIcon from '../../images/icons/sign';
-import { formatTimeSince } from '../../utils/date_utils';
+import {formatTimeSince} from '../../utils/date_utils';
 
-const notificationReasons = {
+const notificationReasons: Record<string, string> = {
   assigned: 'You were assigned to the issue',
   review_requested: 'You were requested to review a merge request.',
   mentioned: 'You were specifically @mentioned in the content.',
   build_failed: 'Gitlab build was failed.',
   marked: 'Task is marked as done.',
   approval_required: 'Your approval is required on this issue.',
-  unmergeable: 'This branch can not be merged.',
-  directly_addressed: 'directly addressed.',
-  merge_train_removed: 'merge train removed.',
+  unmergeable: 'This merge request can not be merged.',
+  directly_addressed: 'You were directly addressed.',
+  merge_train_removed: 'A merge train was removed.',
   attention_required: 'Your attention is required on the issue.',
 };
 
@@ -92,19 +84,13 @@ interface GitlabItemsProps {
 
 function GitlabItems({ items, theme }: GitlabItemsProps) {
   const style = getStyle(theme);
-  return items.length ? (
+  return !items.length ? (
+    <div style={style.container}>{'You have no active items'}</div>
+  ): (
     items.map((item) => {
-      let repoName = '';
-      if (item.references) {
-        repoName = item.references.full;
-      } else if (item.project?.path_with_namespace) {
-        repoName = item.project.path_with_namespace;
-      }
+      const repoName = item.references?.full ?? item.project?.path_with_namespace ?? '';
 
-      let userName = '';
-      if (item.author?.username) {
-        userName = item.author.username;
-      }
+      const userName = item.author?.username ?? '';
 
       let number: JSX.Element | null = null;
       if (item.iid) {
@@ -113,12 +99,9 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
           verticalAlign: 'text-bottom',
         };
 
-        let icon;
-        if (item.merge_status) {
-          icon = <GitPullRequestIcon {...iconProps} />; // item is a pull request
-        } else {
-          icon = <IssueOpenedIcon {...iconProps} />;
-        }
+        const icon = item.merge_status ?
+        <GitPullRequestIcon {...iconProps} /> : // item is a pull request
+        <IssueOpenedIcon {...iconProps} />;
         number = (
           <strong>
             <span style={{ ...style.icon }}>{icon}</span>
@@ -127,18 +110,13 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
         );
       }
 
-      let titleText = '';
-      if (item.title) {
-        titleText = item.title;
-      } else if (item.target?.title) {
-        titleText = item.target.title;
-      }
+      const titleText = item.title ?? item.target?.title ?? '';
 
       let title: JSX.Element | null = <>{titleText}</>;
       if (item.web_url || item.target_url) {
         title = (
           <a
-            href={item.web_url || item.target_url}
+            href={item.web_url ?? item.target_url}
             target='_blank'
             rel='noopener noreferrer'
             style={style.itemTitle}
@@ -157,9 +135,7 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
         }
       }
 
-      let milestone: JSX.Element | null = null;
-      if (item.milestone) {
-        milestone = (
+      const milestone: JSX.Element | null = item.milestone?(
           <span
             style={{
               ...style.milestoneIcon,
@@ -172,13 +148,10 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
             <SignIcon />
             {item.milestone.title}
           </span>
-        );
-      }
+        ):null;
+      
 
-      let labels: JSX.Element[] | null = null;
-      if (item.labels) {
-        labels = getGitlabLabels(item.labels);
-      }
+      let labels: JSX.Element[] | null = item.labels?getGitlabLabels(item.labels):null;
 
       let hasConflict: JSX.Element | null = null;
             if (item.has_conflicts) {
@@ -272,9 +245,7 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
         </div>
       );
     })
-  ) : (
-    <div style={style.container}>{'You have no active items'}</div>
-  );
+  )
 }
 
 const getStyle = makeStyleFromTheme((theme) => {

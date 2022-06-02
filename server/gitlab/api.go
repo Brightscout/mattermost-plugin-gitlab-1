@@ -296,9 +296,10 @@ func (g *gitlab) GetReviews(ctx context.Context, user *UserInfo) ([]*internGitla
 		)
 	} else {
 		result, _, err = client.MergeRequests.ListGroupMergeRequests(g.gitlabGroup, &internGitlab.ListGroupMergeRequestsOptions{
-			AssigneeID: internGitlab.AssigneeID(user.GitlabUserID),
-			State:      &opened,
-			Scope:      &scope,
+			AssigneeID:        internGitlab.AssigneeID(user.GitlabUserID),
+			State:             &opened,
+			Scope:             &scope,
+			WithLabelsDetails: &labelDetails,
 		},
 			internGitlab.WithContext(ctx),
 		)
@@ -331,9 +332,10 @@ func (g *gitlab) GetYourPrs(ctx context.Context, user *UserInfo) ([]*internGitla
 		)
 	} else {
 		result, resp, err = client.MergeRequests.ListGroupMergeRequests(g.gitlabGroup, &internGitlab.ListGroupMergeRequestsOptions{
-			AuthorID: &user.GitlabUserID,
-			State:    &opened,
-			Scope:    &scope,
+			AuthorID:          &user.GitlabUserID,
+			State:             &opened,
+			Scope:             &scope,
+			WithLabelsDetails: &labelDetails,
 		},
 			internGitlab.WithContext(ctx),
 		)
@@ -443,9 +445,10 @@ func (g *gitlab) GetYourAssignments(ctx context.Context, user *UserInfo) ([]*int
 		)
 	} else {
 		result, resp, err = client.Issues.ListGroupIssues(g.gitlabGroup, &internGitlab.ListGroupIssuesOptions{
-			AssigneeID: &user.GitlabUserID,
-			State:      &opened,
-			Scope:      &scope,
+			AssigneeID:       &user.GitlabUserID,
+			State:            &opened,
+			Scope:            &scope,
+			WithLabelDetails: &labelDetails,
 		},
 			internGitlab.WithContext(ctx),
 		)
