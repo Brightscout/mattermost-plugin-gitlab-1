@@ -3,12 +3,12 @@
 
 import React from 'react';
 import Scrollbars from 'react-custom-scrollbars';
-import { Theme } from 'mattermost-redux/types/preferences';
-import { makeStyleFromTheme, changeOpacity } from 'mattermost-redux/utils/theme_utils';
+import {Theme} from 'mattermost-redux/types/preferences';
+import {makeStyleFromTheme, changeOpacity} from 'mattermost-redux/utils/theme_utils';
 
-import { RHSStates } from '../../constants';
+import {RHSStates} from '../../constants';
 import GitlabItems from './gitlab_items';
-import { Item } from '../../types/gitlab_items';
+import {Item} from '../../types/gitlab_items';
 
 interface PropTypes {
     username: string;

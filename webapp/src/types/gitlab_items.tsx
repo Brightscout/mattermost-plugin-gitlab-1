@@ -1,4 +1,4 @@
-import { Theme } from 'mattermost-redux/types/preferences';
+import {Theme} from 'mattermost-redux/types/preferences';
 import * as CSS from 'csstype';
 
 export const notificationReasons: Record<string, string> = {

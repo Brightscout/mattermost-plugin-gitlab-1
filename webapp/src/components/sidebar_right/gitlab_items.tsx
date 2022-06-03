@@ -1,13 +1,13 @@
 import React from 'react';
-import { makeStyleFromTheme, changeOpacity } from 'mattermost-redux/utils/theme_utils';
-import { Badge } from "react-bootstrap";
+import {makeStyleFromTheme, changeOpacity} from 'mattermost-redux/utils/theme_utils';
+import {Badge} from "react-bootstrap";
 import * as CSS from 'csstype';
-import { GitPullRequestIcon, IssueOpenedIcon, IconProps } from '@primer/octicons-react';
+import {GitPullRequestIcon, IssueOpenedIcon, IconProps} from '@primer/octicons-react';
 import SignIcon from '../../images/icons/sign';
-import { formatTimeSince } from '../../utils/date_utils';
-import { GitlabItemsProps, Label, notificationReasons } from "../../types/gitlab_items"
+import {formatTimeSince} from '../../utils/date_utils';
+import {GitlabItemsProps, Label, notificationReasons} from "../../types/gitlab_items"
 
-function GitlabItems({ item, theme }: GitlabItemsProps) {
+function GitlabItems({item, theme}: GitlabItemsProps) {
     const style = getStyle(theme);
 
     const repoName = item.references?.full ?? item.project?.path_with_namespace ?? '';
@@ -24,7 +24,7 @@ function GitlabItems({ item, theme }: GitlabItemsProps) {
             <IssueOpenedIcon {...iconProps} />;
         number = (
             <strong>
-                <span style={{ ...style.icon }}>{icon}</span>
+                <span style={{...style.icon}}>{icon}</span>
                 {`#${item.iid}`}
             </strong>
         );
