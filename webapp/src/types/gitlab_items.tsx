@@ -2,16 +2,16 @@ import {Theme} from 'mattermost-redux/types/preferences';
 import * as CSS from 'csstype';
 
 export const notificationReasons: Record<string, string> = {
-    assigned: 'You were assigned to the issue',
+    assigned: 'You were assigned to the issue/merge request',
     review_requested: 'You were requested to review a merge request.',
     mentioned: 'You were specifically @mentioned in the content.',
     build_failed: 'Gitlab build was failed.',
     marked: 'Task is marked as done.',
-    approval_required: 'Your approval is required on this issue.',
+    approval_required: 'Your approval is required on this issue/merge request.',
     unmergeable: 'This merge request can not be merged.',
     directly_addressed: 'You were directly addressed.',
     merge_train_removed: 'A merge train was removed.',
-    attention_required: 'Your attention is required on the issue.',
+    attention_required: 'Your attention is required on the issue/merge request.',
   };
 
 export interface Label {
@@ -66,6 +66,6 @@ export interface Label {
   }
   
   export interface GitlabItemsProps {
-    items: Item[];
+    item: Item;
     theme: Theme;
   }

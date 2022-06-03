@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 
 import {id as pluginId} from '../../manifest';
 
-import SidebarRight from './sidebar_right.jsx';
+import SidebarRight from './sidebar_right.tsx';
 
 function mapStateToProps(state) {
     return {
@@ -14,8 +14,8 @@ function mapStateToProps(state) {
         yourPrs: state[`plugins-${pluginId}`].yourPrs,
         yourAssignments: state[`plugins-${pluginId}`].yourAssignments,
         unreads: state[`plugins-${pluginId}`].unreads,
-        enterpriseURL: state[`plugins-${pluginId}`].enterpriseURL,
         org: state[`plugins-${pluginId}`].organization,
+        gitlabURL: state[`plugins-${pluginId}`].gitlabURL,
         rhsState: state[`plugins-${pluginId}`].rhsState,
     };
 }

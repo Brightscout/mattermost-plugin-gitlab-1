@@ -7,105 +7,97 @@ import SignIcon from '../../images/icons/sign';
 import {formatTimeSince} from '../../utils/date_utils';
 import {GitlabItemsProps, Label, notificationReasons} from "../../types/gitlab_items"
 
-function GitlabItems({ items, theme }: GitlabItemsProps) {
-  const style = getStyle(theme);
-  return !items.length ? (
-    <div style={style.container}>{'You have no active items'}</div>
-  ): (
-    items.map((item) => {
-      const repoName = item.references?.full ?? item.project?.path_with_namespace ?? '';
+function GitlabItems({ item, theme }: GitlabItemsProps) {
+    const style = getStyle(theme);
 
-      const userName = item.author?.username ?? '';
+    const repoName = item.references?.full ?? item.project?.path_with_namespace ?? '';
+    const userName = item.author?.username ?? '';
 
-      let number: JSX.Element | null = null;
+    let number: JSX.Element | null = null;
+    if (item.iid) {
+      const iconProps: IconProps = {
+        size: 'small',
+        verticalAlign: 'text-bottom',
+      };
+      const icon = item.merge_status ?
+      <GitPullRequestIcon {...iconProps} /> : // item is a pull request
+      <IssueOpenedIcon {...iconProps} />;
+      number = (
+        <strong>
+          <span style={{ ...style.icon }}>{icon}</span>
+          {`#${item.iid}`}
+        </strong>
+      );
+    }
+
+    const titleText = item.title ?? item.target?.title ?? '';
+
+    let title: JSX.Element | null = <>{titleText}</>;
+    if (item.web_url || item.target_url) {
+      title = (
+        <a
+          href={item.web_url ?? item.target_url}
+          target='_blank'
+          rel='noopener noreferrer'
+          style={style.itemTitle}
+        >
+          {titleText}
+        </a>
+      );
       if (item.iid) {
-        const iconProps: IconProps = {
-          size: 'small',
-          verticalAlign: 'text-bottom',
-        };
-
-        const icon = item.merge_status ?
-        <GitPullRequestIcon {...iconProps} /> : // item is a pull request
-        <IssueOpenedIcon {...iconProps} />;
         number = (
           <strong>
-            <span style={{ ...style.icon }}>{icon}</span>
-            {`#${item.iid}`}
+            <a href={item.web_url} target='_blank' rel='noopener noreferrer'>
+              {number}
+            </a>
           </strong>
         );
       }
+    }
 
-      const titleText = item.title ?? item.target?.title ?? '';
-
-      let title: JSX.Element | null = <>{titleText}</>;
-      if (item.web_url || item.target_url) {
-        title = (
-          <a
-            href={item.web_url ?? item.target_url}
-            target='_blank'
-            rel='noopener noreferrer'
-            style={style.itemTitle}
-          >
-            {titleText}
-          </a>
-        );
-        if (item.iid) {
-          number = (
-            <strong>
-              <a href={item.web_url} target='_blank' rel='noopener noreferrer'>
-                {number}
-              </a>
-            </strong>
-          );
-        }
-      }
-
-      const milestone: JSX.Element | null = item.milestone?(
-          <span
-            style={{
-              ...style.milestoneIcon,
-              ...style.icon,
-              ...((item.created_at || userName) && {
-                paddingLeft: 10,
-              }),
-            }}
-          >
-            <SignIcon />
-            {item.milestone.title}
-          </span>
-        ):null;
-      
-
-      let labels: JSX.Element[] | null = item.labels?getGitlabLabels(item.labels):null;
-
-      return (
-        <div key={item.id} style={style.container}>
-          <div>
-            <strong>
-                {title}
-            </strong>
-          </div>
-          <div>
-            {number}
-            <span className='light'>{`(${repoName})`}</span>
-          </div>
-          {labels}
-          <div className='light' style={style.subtitle}>
-            {item.created_at && `Opened ${formatTimeSince(item.created_at)} ago ${userName && ` by ${userName}.`}`}
-            {milestone}
-          </div>
-          <div className="light" style={style.subtitle}>
-          {item.action_name ? (
-              <>
-                <div>{item.updated_at && `${formatTimeSince(item.updated_at)} ago`}</div>
-                {notificationReasons[item.action_name]}
-              </>
-            ) : null}
-          </div>
+    const milestone: JSX.Element | null = item.milestone?(
+        <span
+          style={{
+            ...style.milestoneIcon,
+            ...style.icon,
+            ...((item.created_at || userName) && {
+              paddingLeft: 10,
+            }),
+          }}
+        >
+          <SignIcon />
+          {item.milestone.title}
+        </span>
+      ):null;
+    
+    let labels: JSX.Element[] | null = item.labels?getGitlabLabels(item.labels):null;
+    
+    return (
+      <div key={item.id} style={style.container}>
+        <div>
+          <strong>
+              {title}
+          </strong>
         </div>
-      );
-    })
-  )
+        <div>
+          {number}
+          <span className='light'>{`(${repoName})`}</span>
+        </div>
+        {labels}
+        <div className='light' style={style.subtitle}>
+          {item.created_at && `Opened ${formatTimeSince(item.created_at)} ago ${userName && ` by ${userName}.`}`}
+          {milestone}
+        </div>
+        <div className="light" style={style.subtitle}>
+        {item.action_name ? (
+            <>
+              <div>{item.updated_at && `${formatTimeSince(item.updated_at)} ago`}</div>
+              {notificationReasons[item.action_name]}
+            </>
+          ) : null}
+        </div>
+      </div>
+    );
 }
 
 const getStyle = makeStyleFromTheme((theme) => {
