@@ -254,12 +254,10 @@ func (g *gitlab) GetYourRepos(ctx context.Context, user *UserInfo) ([]*internGit
 		return nil, err
 	}
 	owned := true
-	simple := true
 
 	result, resp, err := client.Projects.ListProjects(
 		&internGitlab.ListProjectsOptions{
 			Owned:  &owned,
-			Simple: &simple,
 		},
 		internGitlab.WithContext(ctx),
 	)
