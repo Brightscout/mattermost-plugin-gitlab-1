@@ -8,7 +8,7 @@ import {bindActionCreators} from 'redux';
 import {getYourPrsDetails, getReviewsDetails} from '../../actions';
 import {id as pluginId} from '../../manifest';
 
-import SidebarRight from './sidebar_right.jsx';
+import SidebarRight from './sidebar_right.tsx';
 
 function mapPrsToDetails(prs, details) {
     if (!prs) {
@@ -42,8 +42,8 @@ function mapStateToProps(state) {
         yourPrs: mapPrsToDetails(state[`plugins-${pluginId}`].yourPrs, state[`plugins-${pluginId}`].yourPrsDetails),
         yourAssignments: state[`plugins-${pluginId}`].yourAssignments,
         unreads: state[`plugins-${pluginId}`].unreads,
-        enterpriseURL: state[`plugins-${pluginId}`].enterpriseURL,
         org: state[`plugins-${pluginId}`].organization,
+        gitlabURL: state[`plugins-${pluginId}`].gitlabURL,
         rhsState: state[`plugins-${pluginId}`].rhsState,
     };
 }

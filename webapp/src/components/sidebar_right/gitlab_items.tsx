@@ -5,183 +5,80 @@ import {
 } from 'mattermost-redux/utils/theme_utils';
 import { Badge, Tooltip, OverlayTrigger } from "react-bootstrap";
 import * as CSS from 'csstype';
-import { Theme } from 'mattermost-redux/types/preferences';
-import {
-  GitPullRequestIcon,
-  IssueOpenedIcon,
-  IconProps,
-} from '@primer/octicons-react';
-
+import {GitPullRequestIcon, IssueOpenedIcon, IconProps} from '@primer/octicons-react';
 import CrossIcon from "../../images/icons/cross";
 import DotIcon from "../../images/icons/dot";
 import TickIcon from "../../images/icons/tick";
 import SignIcon from '../../images/icons/sign';
-import { formatTimeSince } from '../../utils/date_utils';
+import {formatTimeSince} from '../../utils/date_utils';
+import {GitlabItemsProps, Label, notificationReasons} from "../../types/gitlab_items"
 
-const notificationReasons = {
-  assigned: 'You were assigned to the issue',
-  review_requested: 'You were requested to review a pull request.',
-  mentioned: 'You were specifically @mentioned in the content.',
-  build_failed: 'Gitlab build was failed.',
-  marked: 'Task is marked as done.',
-  approval_required: 'Your approval is required on this issue.',
-  unmergeable: 'This branch can not be merged.',
-  directly_addressed: 'directly addressed.',
-  merge_train_removed: 'merge train removed.',
-  attention_required: 'Your attention is required on the issue.',
-};
+function GitlabItems({ item, theme }: GitlabItemsProps) {
+    const style = getStyle(theme);
 
-interface Label {
-  id: number;
-  name: string;
-  color: CSS.Properties;
-  text_color: CSS.Properties;
-}
+    const repoName = item.references?.full ?? item.project?.path_with_namespace ?? '';
+    const userName = item.author?.username ?? '';
 
-interface User {
-  username: string;
-}
+    let number: JSX.Element | null = null;
+    if (item.iid) {
+      const iconProps: IconProps = {
+        size: 'small',
+        verticalAlign: 'text-bottom',
+      };
+      const icon = item.merge_status ?
+      <GitPullRequestIcon {...iconProps} /> : // item is a pull request
+      <IssueOpenedIcon {...iconProps} />;
+      number = (
+        <strong>
+          <span style={{ ...style.icon }}>{icon}</span>
+          {`#${item.iid}`}
+        </strong>
+      );
+    }
 
-interface References {
-  full: string;
-}
+    const titleText = item.title ?? item.target?.title ?? '';
 
-interface Project {
-  path_with_namespace: string;
-}
-
-interface Target {
-  title: string;
-}
-
-interface Item {
-  url: string;
-  status:string;
-  iid: number;
-  total_reviewers:number;
-  has_conflicts:boolean;
-  id: number;
-  title: string;
-  created_at: string;
-  updated_at: string;
-  action_name: keyof typeof notificationReasons;
-  web_url: string;
-  target_url: string;
-  repository_url?: string;
-  author: User;
-  references: References;
-  project: Project;
-  merge_status: string;
-  merge_error: string;
-  owner?: User;
-  milestone?: {
-    title: string;
-  };
-  repository?: {
-    full_name: string;
-  };
-  labels?: Label[];
-  approvers: number;
-  target: Target;
-}
-
-interface GitlabItemsProps {
-  items: Item[];
-  theme: Theme;
-}
-
-function GitlabItems({ items, theme }: GitlabItemsProps) {
-  const style = getStyle(theme);
-  return items.length > 0 ? (
-    items.map((item) => {
-      let repoName = '';
-      if (item.references) {
-        repoName = item.references.full;
-      } else if (item.project?.path_with_namespace) {
-        repoName = item.project.path_with_namespace;
-      }
-
-      let userName = '';
-      if (item.author?.username) {
-        userName = item.author.username;
-      }
-
-      let number: JSX.Element | null = null;
+    let title: JSX.Element | null = <>{titleText}</>;
+    if (item.web_url || item.target_url) {
+      title = (
+        <a
+          href={item.web_url ?? item.target_url}
+          target='_blank'
+          rel='noopener noreferrer'
+          style={style.itemTitle}
+        >
+          {titleText}
+        </a>
+      );
       if (item.iid) {
-        const iconProps: IconProps = {
-          size: 'small',
-          verticalAlign: 'text-bottom',
-        };
-
-        let icon;
-        if (item.merge_status) {
-          // item is a pull request
-          icon = <GitPullRequestIcon {...iconProps} />;
-        } else {
-          icon = <IssueOpenedIcon {...iconProps} />;
-        }
         number = (
           <strong>
-            <span style={{ ...style.icon }}>{icon}</span>
-            {'#' + item.iid}
+            <a href={item.web_url} target='_blank' rel='noopener noreferrer'>
+              {number}
+            </a>
           </strong>
         );
       }
+    }
 
-      let titleText = '';
-      if (item.title) {
-        titleText = item.title;
-      } else if (item.target?.title) {
-        titleText = item.target.title;
-      }
+    const milestone: JSX.Element | null = item.milestone?(
+        <span
+          style={{
+            ...style.milestoneIcon,
+            ...style.icon,
+            ...((item.created_at || userName) && {
+              paddingLeft: 10,
+            }),
+          }}
+        >
+          <SignIcon />
+          {item.milestone.title}
+        </span>
+      ):null;
+    
+    let labels: JSX.Element[] | null = item.labels?getGitlabLabels(item.labels):null;
 
-      let title: JSX.Element | null = <>{titleText}</>;
-      if (item.web_url || item.target_url) {
-        title = (
-          <a
-            href={item.web_url || item.target_url}
-            target='_blank'
-            rel='noopener noreferrer'
-            style={style.itemTitle}
-          >
-            {titleText}
-          </a>
-        );
-        if (item.iid) {
-          number = (
-            <strong>
-              <a href={item.web_url} target='_blank' rel='noopener noreferrer'>
-                {number}
-              </a>
-            </strong>
-          );
-        }
-      }
-
-      let milestone: JSX.Element | null = null;
-      if (item.milestone) {
-        milestone = (
-          <span
-            style={{
-              ...style.milestoneIcon,
-              ...style.icon,
-              ...((item.created_at || userName) && {
-                paddingLeft: 10,
-              }),
-            }}
-          >
-            <SignIcon />
-            {item.milestone.title}
-          </span>
-        );
-      }
-
-      let labels: JSX.Element[] | null = null;
-      if (item.labels) {
-        labels = getGitlabLabels(item.labels);
-      }
-
-      let hasConflict: JSX.Element | null = null;
+    let hasConflict: JSX.Element | null = null;
             if (item.has_conflicts) {
                 hasConflict = (
                     <OverlayTrigger
@@ -208,13 +105,13 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
                     case "success":
                         status = (
                             <span
-                                style={{ ...style.icon, ...style.iconSucess }}
+                                style={{ ...style.icon, ...style.iconSuccess }}
                             >
                                 <TickIcon />
                             </span>
                         );
                         break;
-                    case "success":
+                    case "pending":
                         status = (
                             <span
                                 style={{ ...style.icon, ...style.iconPending }}
@@ -237,51 +134,40 @@ function GitlabItems({ items, theme }: GitlabItemsProps) {
       const reviews = (
         <div style={style.subtitle}>
             <span className="light">
-                {item.approvers +
-                    " out of " +
-                    item.total_reviewers+
-                    " " + (item.total_reviewers>1?"reviews":"review") +
-                    " complete."}
+                {`${item.approvers} out of ${item.total_reviewers} ${(item.total_reviewers>1?"reviews":"review")} complete.`}
             </span>
         </div>
       )
 
-      return (
-        <div key={item.id} style={style.container}>
-          <div>
-            <strong>
-                {title}
-                {status}
-                {hasConflict}
-            </strong>
-          </div>
-          <div>
-            {number}
-            <span className='light'>{'(' + repoName + ')'}</span>
-          </div>
-          {labels}
-          <div className='light' style={style.subtitle}>
-            {item.created_at &&
-              'Opened ' + formatTimeSince(item.created_at) + ' ago'}
-            {userName && ' by ' + userName}
-            {(item.created_at || userName) && '.'}
-            {milestone}
-            {item.action_name ? (
-              <>
-                {(item.created_at || userName || milestone) && <br />}
-                {item.updated_at && formatTimeSince(item.updated_at) + ' ago'}
-                {<br />}
-                {notificationReasons[item.action_name]}
-              </>
-            ) : null}
-          </div>
-          {item.total_reviewers>0 && reviews}
+    return (
+      <div key={item.id} style={style.container}>
+        <div>
+          <strong>
+              {title}
+              {status}
+              {hasConflict}
+          </strong>
         </div>
-      );
-    })
-  ) : (
-    <div style={style.container}>{'You have no active items'}</div>
-  );
+        <div>
+          {number}
+          <span className='light'>{`(${repoName})`}</span>
+        </div>
+        {labels}
+        <div className='light' style={style.subtitle}>
+          {item.created_at && `Opened ${formatTimeSince(item.created_at)} ago ${userName && ` by ${userName}.`}`}
+          {milestone}
+        </div>
+        <div className="light" style={style.subtitle}>
+        {item.action_name ? (
+            <>
+              <div>{item.updated_at && `${formatTimeSince(item.updated_at)} ago`}</div>
+              {notificationReasons[item.action_name]}
+            </>
+          ) : null}
+        </div>
+        {item.total_reviewers>0 && reviews}
+      </div>
+    );
 }
 
 const getStyle = makeStyleFromTheme((theme) => {
@@ -303,15 +189,13 @@ const getStyle = makeStyleFromTheme((theme) => {
       fontSize: '13px',
     },
     icon: {
-      top: 3,
+      top: '3px',
       position: 'relative',
-      left: 3,
-      height: 18,
       display: 'inline-flex',
       alignItems: 'center',
       marginRight: '6px',
     },
-    iconSucess: {
+    iconSuccess: {
       color: theme.onlineIndicator,
     },
     iconPending: {
@@ -327,11 +211,6 @@ const getStyle = makeStyleFromTheme((theme) => {
       color: theme.dndIndicator,
     },
     milestoneIcon: {
-      top: 3,
-      position: 'relative',
-      height: 18,
-      display: 'inline-flex',
-      alignItems: 'center',
       color: theme.centerChannelColor,
     },
   };
