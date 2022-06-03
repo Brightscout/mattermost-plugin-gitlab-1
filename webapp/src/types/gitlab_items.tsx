@@ -1,4 +1,4 @@
-import {Theme} from 'mattermost-redux/types/preferences';
+import { Theme } from 'mattermost-redux/types/preferences';
 import * as CSS from 'csstype';
 
 export const notificationReasons: Record<string, string> = {
@@ -12,35 +12,35 @@ export const notificationReasons: Record<string, string> = {
     directly_addressed: 'You were directly addressed.',
     merge_train_removed: 'A merge train was removed.',
     attention_required: 'Your attention is required on the issue/merge request.',
-  };
+};
 
 export interface Label {
     id: number;
     name: string;
     color: CSS.Properties;
     text_color: CSS.Properties;
-  }
-  
-  export interface User {
+}
+
+export interface User {
     username: string;
-  }
-  
-  export interface References {
+}
+
+export interface References {
     full: string;
-  }
-  
-  export interface Project {
+}
+
+export interface Project {
     path_with_namespace: string;
-  }
-  
-  export interface Target {
+}
+
+export interface Target {
     title: string;
-  }
-  
-  export interface Item {
+}
+
+export interface Item {
     url: string;
     iid: number;
-    has_conflicts:boolean;
+    has_conflicts: boolean;
     id: number;
     title: string;
     created_at: string;
@@ -56,16 +56,16 @@ export interface Label {
     merge_error: string;
     owner?: User;
     milestone?: {
-      title: string;
+        title: string;
     };
     repository?: {
-      full_name: string;
+        full_name: string;
     };
     labels?: Label[];
     target: Target;
-  }
-  
-  export interface GitlabItemsProps {
+}
+
+export interface GitlabItemsProps {
     item: Item;
     theme: Theme;
-  }
+}

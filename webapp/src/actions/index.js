@@ -197,8 +197,8 @@ export function getGitlabUser(userID) {
         const user = getState()[`plugins-${id}`].gitlabUsers[userID];
         if (
             user &&
-      user.last_try &&
-      Date.now() - user.last_try < GITLAB_USER_GET_TIMEOUT_MILLISECONDS
+            user.last_try &&
+            Date.now() - user.last_try < GITLAB_USER_GET_TIMEOUT_MILLISECONDS
         ) {
             return {};
         }
