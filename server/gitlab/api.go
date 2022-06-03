@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	stateOpened = "opened"
-	scopeAll    = "all"
-	withLabels  = true
+	stateOpened      = "opened"
+	scopeAll         = "all"
+	withLabelDetails = true
 )
 
 // NewGroupHook creates a webhook associated with a GitLab group
@@ -257,7 +257,7 @@ func (g *gitlab) GetYourRepos(ctx context.Context, user *UserInfo) ([]*internGit
 
 	result, resp, err := client.Projects.ListProjects(
 		&internGitlab.ListProjectsOptions{
-			Owned:  &owned,
+			Owned: &owned,
 		},
 		internGitlab.WithContext(ctx),
 	)
@@ -279,7 +279,7 @@ func (g *gitlab) GetReviews(ctx context.Context, user *UserInfo) ([]*internGitla
 
 	opened := stateOpened
 	scope := scopeAll
-	labelDetails := withLabels
+	labelDetails := withLabelDetails
 
 	var result []*internGitlab.MergeRequest
 
@@ -314,7 +314,7 @@ func (g *gitlab) GetYourPrs(ctx context.Context, user *UserInfo) ([]*internGitla
 
 	opened := stateOpened
 	scope := scopeAll
-	labelDetails := withLabels
+	labelDetails := withLabelDetails
 
 	var result []*internGitlab.MergeRequest
 	var resp *internGitlab.Response
@@ -427,7 +427,7 @@ func (g *gitlab) GetYourAssignments(ctx context.Context, user *UserInfo) ([]*int
 
 	opened := stateOpened
 	scope := scopeAll
-	labelDetails := withLabels
+	labelDetails := withLabelDetails
 
 	var result []*internGitlab.Issue
 	var resp *internGitlab.Response
