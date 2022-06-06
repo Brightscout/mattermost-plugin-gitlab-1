@@ -248,7 +248,7 @@ func (g *gitlab) GetProject(ctx context.Context, user *UserInfo, owner, repo str
 	return result, nil
 }
 
-func (g *gitlab) GetYourRepos(ctx context.Context, user *UserInfo) ([]*internGitlab.Project, error) {
+func (g *gitlab) GetYourProjects(ctx context.Context, user *UserInfo) ([]*internGitlab.Project, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
 		return nil, err
@@ -259,6 +259,69 @@ func (g *gitlab) GetYourRepos(ctx context.Context, user *UserInfo) ([]*internGit
 		&internGitlab.ListProjectsOptions{
 			Owned: &owned,
 		},
+		internGitlab.WithContext(ctx),
+	)
+	if respErr := checkResponse(resp); respErr != nil {
+		return nil, respErr
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (g *gitlab) GetLabels(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.Label, error) {
+	client, err := g.gitlabConnect(*user.Token)
+	if err != nil {
+		return nil, err
+	}
+	var projectID interface{} = pid
+	result, resp, err := client.Labels.ListLabels(
+		projectID,
+		&internGitlab.ListLabelsOptions{},
+		internGitlab.WithContext(ctx),
+	)
+	if respErr := checkResponse(resp); respErr != nil {
+		return nil, respErr
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (g *gitlab) GetMilestones(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.Milestone, error) {
+	client, err := g.gitlabConnect(*user.Token)
+	if err != nil {
+		return nil, err
+	}
+	var projectID interface{} = pid
+	result, resp, err := client.Milestones.ListMilestones(
+		projectID,
+		&internGitlab.ListMilestonesOptions{},
+		internGitlab.WithContext(ctx),
+	)
+	if respErr := checkResponse(resp); respErr != nil {
+		return nil, respErr
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (g *gitlab) GetAssignees(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.ProjectMember, error) {
+	client, err := g.gitlabConnect(*user.Token)
+	if err != nil {
+		return nil, err
+	}
+	var projectID interface{} = pid
+	result, resp, err := client.ProjectMembers.ListProjectMembers(
+		projectID,
+		&internGitlab.ListProjectMembersOptions{},
 		internGitlab.WithContext(ctx),
 	)
 	if respErr := checkResponse(resp); respErr != nil {
@@ -427,26 +490,26 @@ func (g *gitlab) GetYourAssignments(ctx context.Context, user *UserInfo) ([]*int
 
 	opened := stateOpened
 	scope := scopeAll
-	labelDetails := withLabelDetails
+	// labelDetails := withLabelDetails
 
 	var result []*internGitlab.Issue
 	var resp *internGitlab.Response
 
 	if g.gitlabGroup == "" {
 		result, resp, err = client.Issues.ListIssues(&internGitlab.ListIssuesOptions{
-			AssigneeID:       &user.GitlabUserID,
-			State:            &opened,
-			Scope:            &scope,
-			WithLabelDetails: &labelDetails,
+			AssigneeID: &user.GitlabUserID,
+			State:      &opened,
+			Scope:      &scope,
+			// WithLabelDetails: &labelDetails,
 		},
 			internGitlab.WithContext(ctx),
 		)
 	} else {
 		result, resp, err = client.Issues.ListGroupIssues(g.gitlabGroup, &internGitlab.ListGroupIssuesOptions{
-			AssigneeID:       &user.GitlabUserID,
-			State:            &opened,
-			Scope:            &scope,
-			WithLabelDetails: &labelDetails,
+			AssigneeID: &user.GitlabUserID,
+			State:      &opened,
+			Scope:      &scope,
+			// WithLabelDetails: &labelDetails,
 		},
 			internGitlab.WithContext(ctx),
 		)
@@ -488,18 +551,31 @@ func (g *gitlab) GetUnreads(ctx context.Context, user *UserInfo) ([]*internGitla
 	return notifications, nil
 }
 
-func (g *gitlab) CreateIssue(ctx context.Context, user *UserInfo, issue *internGitlab.Issue) (*internGitlab.Issue, error) {
+type IssueRequest struct {
+	ID          int                 `json:"id"`
+	Title       string              `json:"title"`
+	Description string              `json:"description"`
+	Milestone   int                 `json:"milestone"`
+	ProjectID   int                 `json:"project_id"`
+	Assignees   []int               `json:"assignees"`
+	Labels      internGitlab.Labels `json:"labels"`
+}
+
+func (g *gitlab) CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRequest) (*internGitlab.Issue, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
 		return nil, err
 	}
-	var pid interface{} = issue.ID
+	var pid interface{} = issue.ProjectID
+
 	result, resp, err := client.Issues.CreateIssue(
 		pid,
 		&internGitlab.CreateIssueOptions{
 			Title:       &issue.Title,
 			Description: &issue.Description,
-			MilestoneID: &issue.Milestone.ID,
+			MilestoneID: &issue.Milestone,
+			AssigneeIDs: &issue.Assignees,
+			Labels:      &issue.Labels,
 		},
 		internGitlab.WithContext(ctx),
 	)

@@ -192,7 +192,7 @@ const createIssueModal = (state = '', action) => {
     }
 };
 
-function yourRepos(state = [], action) {
+function yourProjects(state = [], action) {
     switch (action.type) {
     case ActionTypes.RECEIVED_REPOSITORIES:
         return action.data;
@@ -220,5 +220,5 @@ export default combineReducers({
     reviewsDetails,
     isCreateIssueModalVisible,
     createIssueModal,
-    yourRepos,
+    yourProjects,
 });

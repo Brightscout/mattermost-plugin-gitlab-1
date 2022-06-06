@@ -5,22 +5,22 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
 import {id as pluginId} from 'manifest';
-import {getRepos} from '../../actions';
+import {getProjects} from '../../actions';
 
-import GithubRepoSelector from './github_repo_selector.jsx';
+import GithubProjectSelector from './gitlab_project_selector.jsx';
 
 function mapStateToProps(state) {
     return {
-        yourRepos: state[`plugins-${pluginId}`].yourRepos,
+        yourProjects: state[`plugins-${pluginId}`].yourProjects,
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({
-            getRepos,
+            getProjects,
         }, dispatch),
     };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GithubRepoSelector);
+export default connect(mapStateToProps, mapDispatchToProps)(GithubProjectSelector);

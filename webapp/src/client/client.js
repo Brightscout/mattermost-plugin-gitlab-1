@@ -38,8 +38,24 @@ export default class Client {
         return this.doPost(`${this.url}/user`, {user_id: userID});
     };
 
-    getRepositories = async () => {
-        return this.doGet(`${this.url}/repositories`);
+    createIssue = async (payload) => {
+        return this.doPost(`${this.url}/createissue`, payload);
+    }
+
+    getProjects = async () => {
+        return this.doGet(`${this.url}/projects`);
+    }
+
+    getLabels = async (pid) => {
+        return this.doGet(`${this.url}/labels?pid=${pid}`);
+    }
+
+    getMilestones = async (pid) => {
+        return this.doGet(`${this.url}/milestones?pid=${pid}`);
+    }
+
+    getAssignees = async (pid) => {
+        return this.doGet(`${this.url}/assignees?pid=${pid}`);
     }
 
     doGet = async (url, body, headers = {}) => {

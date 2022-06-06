@@ -2,21 +2,21 @@ import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {Modal} from 'react-bootstrap';
 
-// import GithubLabelSelector from 'components/github_label_selector';
-// import GithubAssigneeSelector from 'components/github_assignee_selector';
-// import GithubMilestoneSelector from 'components/github_milestone_selector';
-// import  GitLabRepoSelector from 'components/gitlab_repo_selector';
-import Validator from 'components/validator';
-import FormButton from 'components/form_button';
+import GitlabLabelSelector from 'components/gitlab_label_selector';
+import GitlabAssigneeSelector from 'components/gitlab_assignee_selector';
+import GitlabMilestoneSelector from 'components/gitlab_milestone_selector';
+import GitlabProjectSelector from 'components/gitlab_project_selector';
+// import Validator from 'components/validator';   
+import FormButton from 'components/form_button';                                                                            
 import Input from 'components/input';
-// import {getErrorMessage} from 'utils/user_utils';
+import {getErrorMessage} from 'utils/user_utils';
 
 const MAX_TITLE_LENGTH = 256;
 
 const initialState = {
     submitting: false,
     error: null,
-    repo: null,
+    project: null,
     issueTitle: '',
     issueDescription: '',
     labels: [],
@@ -40,111 +40,111 @@ export default class CreateIssueModal extends PureComponent {
     constructor(props) {
         super(props);
         this.state = initialState;
-        this.validator = new Validator();
+        // this.validator = new Validator();
     }
 
-    // componentDidUpdate(prevProps) {
-    //     if (this.props.post && !prevProps.post) {
-    //         this.setState({issueDescription: this.props.post.message}); //eslint-disable-line react/no-did-update-set-state
-    //     } else if (this.props.channelId && (this.props.channelId !== prevProps.channelId || this.props.title !== prevProps.title)) {
-    //         const title = this.props.title.substring(0, MAX_TITLE_LENGTH);
-    //         this.setState({issueTitle: title}); // eslint-disable-line react/no-did-update-set-state
-    //     }
-    // }
+    componentDidUpdate(prevProps) {
+        if (this.props.post && !prevProps.post) {
+            this.setState({issueDescription: this.props.post.message}); //eslint-disable-line react/no-did-update-set-state
+        } else if (this.props.channelId && (this.props.channelId !== prevProps.channelId || this.props.title !== prevProps.title)) {
+            const title = this.props.title.substring(0, MAX_TITLE_LENGTH);
+            this.setState({issueTitle: title}); // eslint-disable-line react/no-did-update-set-state
+        }
+    }
 
     // handle issue creation after form is populated
     handleCreate = async (e) => {
-        // if (e && e.preventDefault) {
-        //     e.preventDefault();
-        // }
+        e.preventDefault();
 
-        // if (!this.validator.validate() || !this.state.issueTitle) {
-        //     this.setState({
-        //         issueTitleValid: Boolean(this.state.issueTitle),
-        //         showErrors: true,
-        //     });
-        //     return;
-        // }
+        // // if (!this.validator.validate() || !this.state.issueTitle) {
+        // //     this.setState({
+        // //         issueTitleValid: Boolean(this.state.issueTitle),
+        // //         showErrors: true,
+        // //     });
+        // //     return;
+        // // }
 
-        // const {post} = this.props;
-        // const postId = (post) ? post.id : '';
+        const {post} = this.props;
+        const postId = post?.id ?? '';
 
-        // const issue = {
-        //     title: this.state.issueTitle,
-        //     body: this.state.issueDescription,
-        //     repo: this.state.repo && this.state.repo.name,
-        //     labels: this.state.labels,
-        //     assignees: this.state.assignees,
-        //     milestone: this.state.milestone && this.state.milestone.value,
-        //     post_id: postId,
-        //     channel_id: this.props.channelId,
-        // };
+        const issue = {
+            title: this.state.issueTitle,
+            description: this.state.issueDescription,
+            project_id: this.state.project?.project_id,
+            labels: this.state.labels.map((label)=>label.value),
+            assignees: this.state.assignees.map((assignee)=>assignee.value),
+            milestone: this.state.milestone?.value,
+            post_id: postId,
+            channel_id: this.props.channelId,
+        };
 
-        // this.setState({submitting: true});
+        this.setState({submitting: true});
 
-        // const created = await this.props.create(issue);
-        // if (created.error) {
-        //     const errMessage = getErrorMessage(created.error.message);
-        //     this.setState({
-        //         error: errMessage,
-        //         showErrors: true,
-        //         submitting: false,
-        //     });
-        //     return;
-        // }
-        console.log("created")
+        const created = await this.props.create(issue);
+        if (created.error) {
+            const errMessage = getErrorMessage(created.error.message);
+            console.log("error",errMessage);
+            this.setState({
+                error: errMessage,
+                showErrors: true,
+                submitting: false,
+            });
+            return;
+        }
+        console.log(created);
         this.handleClose(e);
     };
 
     handleClose = (e) => {
-        if (e && e.preventDefault) {
-            e.preventDefault();
-        }
+        e.preventDefault();
         this.setState(initialState, this.props.close);
     };
 
-    handleRepoChange = (repo) => this.setState({repo});
+    handleProjectChange = (project) => this.setState({project});
 
-    // handleLabelsChange = (labels) => this.setState({labels});
+    handleLabelsChange = (labels) => this.setState({labels});
 
-    // handleAssigneesChange = (assignees) => this.setState({assignees});
+    handleAssigneesChange = (assignees) => this.setState({assignees});
 
-    // handleMilestoneChange = (milestone) => this.setState({milestone});
+    handleMilestoneChange = (milestone) => this.setState({milestone});
 
     handleIssueTitleChange = (issueTitle) => this.setState({issueTitle});
 
-    // handleIssueDescriptionChange = (issueDescription) => this.setState({issueDescription});
+    handleIssueDescriptionChange = (issueDescription) => this.setState({issueDescription});
 
-    // renderIssueAttributeSelectors = () => {
-    //     if (!this.state.repo || (this.state.repo.permissions && !this.state.repo.permissions.push)) {
-    //         return null;
-    //     }
+    renderIssueAttributeSelectors = () => {
+        if (!this.state.project) {
+            return null;
+        }
 
-    //     return (
-    //         <>
-    //             <GithubLabelSelector
-    //                 repoName={this.state.repo.name}
-    //                 theme={this.props.theme}
-    //                 selectedLabels={this.state.labels}
-    //                 onChange={this.handleLabelsChange}
-    //             />
+        return (
+            <>
+                <GitlabLabelSelector
+                    projectID = {this.state.project?.project_id}
+                    projectName={this.state.project.name}
+                    theme={this.props.theme}
+                    selectedLabels={this.state.labels}
+                    onChange={this.handleLabelsChange}
+                />
 
-    //             <GithubAssigneeSelector
-    //                 repoName={this.state.repo.name}
-    //                 theme={this.props.theme}
-    //                 selectedAssignees={this.state.assignees}
-    //                 onChange={this.handleAssigneesChange}
-    //             />
+                <GitlabAssigneeSelector
+                    projectID = {this.state.project?.project_id}
+                    projectName={this.state.project.name}
+                    theme={this.props.theme}
+                    selectedAssignees={this.state.assignees}
+                    onChange={this.handleAssigneesChange}
+                />
 
-    //             <GithubMilestoneSelector
-    //                 repoName={this.state.repo.name}
-    //                 theme={this.props.theme}
-    //                 selectedMilestone={this.state.milestone}
-    //                 onChange={this.handleMilestoneChange}
-    //             />
-    //         </>
-    //     );
-    // }
+                <GitlabMilestoneSelector
+                    projectID = {this.state.project?.project_id}
+                    projectName={this.state.project.name}
+                    theme={this.props.theme}
+                    selectedMilestone={this.state.milestone}
+                    onChange={this.handleMilestoneChange}
+                />
+            </>
+        );
+    }
 
     render() {
         if (!this.props.visible) {
@@ -176,14 +176,14 @@ export default class CreateIssueModal extends PureComponent {
 
         const component = (
             <div>
-                {/* <GitLabRepoSelector
-                    onChange={this.handleRepoChange}
-                    value={this.state.repo && this.state.repo.name}
+                <GitlabProjectSelector
+                    onChange={this.handleProjectChange}
+                    value={this.state.project && this.state.project.name}
                     required={true}
                     theme={theme}
-                    addValidate={this.validator.addComponent}
-                    removeValidate={this.validator.removeComponent}
-                /> */}
+                    // addValidate={this.validator.addComponent}
+                    // removeValidate={this.validator.removeComponent}
+                />
 
                 <Input
                     id={'title'}
@@ -197,7 +197,7 @@ export default class CreateIssueModal extends PureComponent {
                 />
                 {issueTitleValidationError}
 
-                {/* {this.renderIssueAttributeSelectors()} */}
+                {this.renderIssueAttributeSelectors()}
 
                 <Input
                     label='Description for the GitLab Issue'

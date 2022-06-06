@@ -9,7 +9,7 @@ import {isSystemMessage} from 'mattermost-redux/utils/post_utils';
 import {id as pluginId} from 'manifest';
 import {openCreateIssueModal} from 'actions';
 
-import CreateIssuePostMenuAction from './create_issue';
+import CreateIssuePostMenuAction from './create_issue.tsx';
 
 const mapStateToProps = (state, ownProps) => {
     const post = getPost(state, ownProps.postId);

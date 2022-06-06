@@ -10,7 +10,6 @@ import CreateIssueModal from './create_issue';
 const mapStateToProps = (state) => {
     const {postId, title, channelId} = state[`plugins-${pluginId}`].createIssueModal;
     const post = (postId) ? getPost(state, postId) : null;
-
     return {
         visible: state[`plugins-${pluginId}`].isCreateIssueModalVisible,
         post,

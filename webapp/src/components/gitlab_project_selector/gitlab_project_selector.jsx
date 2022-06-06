@@ -11,16 +11,16 @@ const initialState = {
     error: null,
 };
 
-export default class GitlabRepoSelector extends PureComponent {
+export default class GitlabProjectSelector extends PureComponent {
     static propTypes = {
-        yourRepos: PropTypes.array.isRequired,
+        yourProjects: PropTypes.array.isRequired,
         theme: PropTypes.object.isRequired,
         onChange: PropTypes.func.isRequired,
         value: PropTypes.string,
-        addValidate: PropTypes.func,
-        removeValidate: PropTypes.func,
+        // addValidate: PropTypes.func,
+        // removeValidate: PropTypes.func,
         actions: PropTypes.shape({
-            getRepos: PropTypes.func.isRequired,
+            getProjects: PropTypes.func.isRequired,
         }).isRequired,
     };
 
@@ -30,35 +30,34 @@ export default class GitlabRepoSelector extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.getRepos();
+        this.props.actions.getProjects();
     }
 
     onChange = (_, name) => {
-        const repo = this.props.yourRepos.find((r) => r.full_name === name);
-        this.props.onChange({name, permissions: repo.permissions});
+        const project = this.props.yourProjects.find((p) => p.path_with_namespace === name);
+        this.props.onChange({name, permissions: project.permissions,project_id: project.id});
     }
 
     render() {
-        const repoOptions = this.props.yourRepos.map((item) => ({value: item.full_name, label: item.full_name}));
-
+        const projectOptions = this.props.yourProjects.map((item) => ({value: item.path_with_namespace, label: item.path_with_namespace}));
         return (
             <div className={'form-group margin-bottom x3'}>
                 <ReactSelectSetting
-                    name={'repo'}
-                    label={'Repository'}
+                    name={'project'}
+                    label={'Project'}
                     limitOptions={true}
                     required={true}
                     onChange={this.onChange}
-                    options={repoOptions}
+                    options={projectOptions}
                     isMulti={false}
-                    key={'repo'}
+                    key={'project'}
                     theme={this.props.theme}
-                    addValidate={this.props.addValidate}
-                    removeValidate={this.props.removeValidate}
-                    value={repoOptions.find((option) => option.value === this.props.value)}
+                    // addValidate={this.props.addValidate}
+                    // removeValidate={this.props.removeValidate}
+                    value={projectOptions.find((option) => option.value === this.props.value)}
                 />
                 <div className={'help-text'}>
-                    {'Returns GitLab repositories connected to the user account'} <br/>
+                    {'Returns GitLab projects connected to the user account'} <br/>
                 </div>
             </div>
         );
