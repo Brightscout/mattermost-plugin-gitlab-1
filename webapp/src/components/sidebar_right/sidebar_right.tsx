@@ -7,10 +7,10 @@ import {Theme} from 'mattermost-redux/types/preferences';
 import {makeStyleFromTheme, changeOpacity} from 'mattermost-redux/utils/theme_utils';
 
 import {RHSStates} from '../../constants';
-import GitlabItems from '../sidebar_right/gitlab_items';
+import GitlabItems from './gitlab_items';
 import {Item} from '../../types/gitlab_items';
 
-interface PropTypes{
+interface PropTypes {
     username: string;
     org: string;
     gitlabURL: string;
@@ -23,7 +23,7 @@ interface PropTypes{
     actions:any,
 };
 
-export function renderView(props:PropTypes) {
+export function renderView(props: PropTypes) {
     return (
         <div
             {...props}
@@ -31,7 +31,7 @@ export function renderView(props:PropTypes) {
         />);
 }
 
-export function renderThumbHorizontal(props:PropTypes) {
+export function renderThumbHorizontal(props: PropTypes) {
     return (
         <div
             {...props}
@@ -39,7 +39,7 @@ export function renderThumbHorizontal(props:PropTypes) {
         />);
 }
 
-export function renderThumbVertical(props:PropTypes) {
+export function renderThumbVertical(props: PropTypes) {
     return (
         <div
             {...props}
@@ -48,35 +48,35 @@ export function renderThumbVertical(props:PropTypes) {
 }
 
 
-function mapGitlabItemListToPrList(gilist:Item[]) {
+function mapGitlabItemListToPrList(gilist: Item[]) {
     if (!gilist) {
         return [];
     }
 
-    return gilist.map((pr:Item) => {
+    return gilist.map((pr: Item) => {
         return {sha: pr.sha, project_id: pr.project_id, iid: pr.iid};
     });
 }
 
-function shouldUpdateDetails(prs:Item[], prevPrs:Item[], targetState:string, currentState:string, prevState:string) {
-    if (currentState === targetState) {
-        if (currentState !== prevState) {
-            return true;
-        }
+function shouldUpdateDetails(prs: Item[], prevPrs: Item[], targetState: string, currentState: string, prevState: string) {
+    if (currentState !== targetState) {
+        return false
+    }
 
-        if (prs.length !== prevPrs.length) {
-            return true;
-        }
+    if (currentState !== prevState) {
+        return true;
+    }
 
-        for (let i = 0; i < prs.length; i++) {
-            if (prs[i].id !== prevPrs[i].id) {
-                return true;
-            }
+    if (prs.length !== prevPrs.length) {
+        return true;
+    }
+
+    for (let i = 0; i < prs.length; i++) {
+        if (prs[i].id !== prevPrs[i].id) {
+            return true;
         }
     }
-    return false;
 }
-
 
 export default class SidebarRight extends React.PureComponent<PropTypes> {
 
@@ -93,7 +93,7 @@ export default class SidebarRight extends React.PureComponent<PropTypes> {
       }
   }
 
-  componentDidUpdate(prevProps:PropTypes) {
+  componentDidUpdate(prevProps: PropTypes) {
       if (
           shouldUpdateDetails(
               this.props.yourPrs,
@@ -136,11 +136,11 @@ export default class SidebarRight extends React.PureComponent<PropTypes> {
       case RHSStates.PRS:
           gitlabItems = this.props.yourPrs;
           title = 'Your Open Merge Requests';
-          listUrl = `${baseURL} /dashboard/merge_requests?state=opened&scope=all&author_username=${this.props.username}&archived=false'${orgQuery}`;
+          listUrl = `${baseURL}/dashboard/merge_requests?state=opened&scope=all&author_username=${this.props.username}&archived=false${orgQuery}`;
           break;
       case RHSStates.REVIEWS:
           gitlabItems = this.props.reviews;
-          listUrl = `${baseURL}/dashboard/merge_requests?state=opened&scope=all&assignee_username=${this.props.username}&archived=false'${orgQuery}`;
+          listUrl = `${baseURL}/dashboard/merge_requests?state=opened&scope=all&assignee_username=${this.props.username}&archived=false${orgQuery}`;
           title = 'Merge Requests Needing Review';
           break;
       case RHSStates.UNREADS:
@@ -161,8 +161,8 @@ export default class SidebarRight extends React.PureComponent<PropTypes> {
           <React.Fragment>
               <Scrollbars
                   autoHide={true}
-                  autoHideTimeout={500}
-                  autoHideDuration={500}
+                  autoHideTimeout={500}     // Hide delay in ms
+                  autoHideDuration={500}     // Duration for hide animation in ms.
                   renderThumbHorizontal={renderThumbHorizontal}
                   renderThumbVertical={renderThumbVertical}
                   renderView={renderView}
@@ -179,9 +179,10 @@ export default class SidebarRight extends React.PureComponent<PropTypes> {
                       </strong>
                   </div>
                   <div>
-                      {!gitlabItems.length?(<div style={style.container}>{'You have no active items'}</div>)
-                      :gitlabItems.map((item)=>
+                      {!gitlabItems.length ? (<div style={style.container}>{'You have no active items'}</div>)
+                      : gitlabItems.map((item)=>
                         <GitlabItems
+                          key={item.id}
                           item={item}
                           theme={this.props.theme}
                       />
@@ -196,12 +197,12 @@ export default class SidebarRight extends React.PureComponent<PropTypes> {
 
 const getStyle = makeStyleFromTheme((theme) => {
     return {
-      container: {
-        padding: '15px',
-        borderTop: `1px solid ${changeOpacity(theme.centerChannelColor, 0.2)}`,
-      },
-      sectionHeader: {
-        padding: '15px',
-    },
+        container: {
+            padding: '15px',
+            borderTop: `1px solid ${changeOpacity(theme.centerChannelColor, 0.2)}`,
+        },
+        sectionHeader: {
+            padding: '15px',
+        },
     };
-  });
+});

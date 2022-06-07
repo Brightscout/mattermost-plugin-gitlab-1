@@ -81,7 +81,7 @@ function reviews(state = [], action) {
 
 function reviewsDetails(state = [], action) {
     switch (action.type) {
-    case ActionTypes.RECEIVED_REVIEWS_DETAILS:
+    case ActionTypes.RECEIVED_REVIEW_DETAILS:
         return action.data;
     default:
         return state;
@@ -99,7 +99,7 @@ function yourPrs(state = [], action) {
 
 function yourPrsDetails(state = [], action) {
     switch (action.type) {
-    case ActionTypes.RECEIVED_YOUR_PRS_DETAILS:
+    case ActionTypes.RECEIVED_YOUR_PR_DETAILS:
         return action.data;
     default:
         return state;
