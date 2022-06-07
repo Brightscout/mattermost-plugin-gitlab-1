@@ -17,8 +17,8 @@ export default class GitlabProjectSelector extends PureComponent {
         theme: PropTypes.object.isRequired,
         onChange: PropTypes.func.isRequired,
         value: PropTypes.string,
-        // addValidate: PropTypes.func,
-        // removeValidate: PropTypes.func,
+        addValidate: PropTypes.func,
+        removeValidate: PropTypes.func,
         actions: PropTypes.shape({
             getProjects: PropTypes.func.isRequired,
         }).isRequired,
@@ -52,8 +52,8 @@ export default class GitlabProjectSelector extends PureComponent {
                     isMulti={false}
                     key={'project'}
                     theme={this.props.theme}
-                    // addValidate={this.props.addValidate}
-                    // removeValidate={this.props.removeValidate}
+                    addValidate={this.props.addValidate}
+                    removeValidate={this.props.removeValidate}
                     value={projectOptions.find((option) => option.value === this.props.value)}
                 />
                 <div className={'help-text'}>

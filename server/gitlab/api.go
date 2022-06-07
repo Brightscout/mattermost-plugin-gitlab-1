@@ -490,7 +490,6 @@ func (g *gitlab) GetYourAssignments(ctx context.Context, user *UserInfo) ([]*int
 
 	opened := stateOpened
 	scope := scopeAll
-	// labelDetails := withLabelDetails
 
 	var result []*internGitlab.Issue
 	var resp *internGitlab.Response
@@ -500,7 +499,6 @@ func (g *gitlab) GetYourAssignments(ctx context.Context, user *UserInfo) ([]*int
 			AssigneeID: &user.GitlabUserID,
 			State:      &opened,
 			Scope:      &scope,
-			// WithLabelDetails: &labelDetails,
 		},
 			internGitlab.WithContext(ctx),
 		)
@@ -509,7 +507,6 @@ func (g *gitlab) GetYourAssignments(ctx context.Context, user *UserInfo) ([]*int
 			AssigneeID: &user.GitlabUserID,
 			State:      &opened,
 			Scope:      &scope,
-			// WithLabelDetails: &labelDetails,
 		},
 			internGitlab.WithContext(ctx),
 		)
@@ -559,6 +556,8 @@ type IssueRequest struct {
 	ProjectID   int                 `json:"project_id"`
 	Assignees   []int               `json:"assignees"`
 	Labels      internGitlab.Labels `json:"labels"`
+	PostID      string              `json:"post_id"`
+	ChannelID   string              `json:"channel_id"`
 }
 
 func (g *gitlab) CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRequest) (*internGitlab.Issue, error) {

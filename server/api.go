@@ -577,7 +577,23 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Please provide a JSON object.", StatusCode: http.StatusBadRequest})
 		return
 	}
-	
+
+	var post *model.Post
+	permalink := ""
+	var appErr *model.AppError
+	if issue.PostID != "" {
+		post, appErr = p.API.GetPost(issue.PostID)
+		if appErr != nil {
+			p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to load post " + issue.PostID, StatusCode: http.StatusInternalServerError})
+			return
+		}
+		if post == nil {
+			p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to load post " + issue.PostID + ": not found", StatusCode: http.StatusNotFound})
+			return
+		}
+		permalink = p.getPermaLink(issue.PostID)
+	}
+
 	result, err := p.GitlabClient.CreateIssue(c.Ctx, c.GitlabInfo, issue)
 	if err != nil {
 		c.Log.WithError(err).Warnf("Can't list create issue in GitLab API")
@@ -585,7 +601,42 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	rootID := issue.PostID
+	channelID := issue.ChannelID
+	message := fmt.Sprintf("Created GitLab issue [#%v](%v)", result.IID, result.WebURL)
+	if post != nil {
+		if post.RootId != "" {
+			rootID = post.RootId
+		}
+		channelID = post.ChannelId
+		message += fmt.Sprintf(" from a [message](%s)", permalink)
+	}
+
+	reply := &model.Post{
+		Message:   message,
+		ChannelId: channelID,
+		RootId:    rootID,
+		UserId:    c.UserID,
+	}
+
+	if post != nil {
+		_, appErr = p.API.CreatePost(reply)
+	} else {
+		p.API.SendEphemeralPost(c.UserID, reply)
+	}
+	if appErr != nil {
+		c.Log.WithError(appErr).Warnf("failed to create notification post")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to create notification post, postID: " + issue.PostID + ", channelID: " + channelID, StatusCode: http.StatusInternalServerError})
+		return
+	}
+
 	p.writeAPIResponse(w, result)
+}
+
+func (p *Plugin) getPermaLink(postID string) string {
+	siteURL := *p.API.GetConfig().ServiceSettings.SiteURL
+
+	return fmt.Sprintf("%v/_redirect/pl/%v", siteURL, postID)
 }
 
 func (p *Plugin) getYourAssignments(c *UserContext, w http.ResponseWriter, r *http.Request) {

@@ -24,12 +24,11 @@ export default class ReactSelectSetting extends React.PureComponent {
             PropTypes.array,
             PropTypes.string,
         ]),
-        // addValidate: PropTypes.func,
-        // removeValidate: PropTypes.func,
+        addValidate: PropTypes.func,
+        removeValidate: PropTypes.func,
         required: PropTypes.bool,
         allowUserDefinedValue: PropTypes.bool,
         limitOptions: PropTypes.bool,
-        // resetInvalidOnChange: PropTypes.bool,
     };
 
     constructor(props) {
@@ -38,23 +37,23 @@ export default class ReactSelectSetting extends React.PureComponent {
         this.state = {invalid: false};
     }
 
-    // componentDidMount() {
-    //     if (this.props.addValidate && this.props.name) {
-    //         this.props.addValidate(this.props.name, this.isValid);
-    //     }
-    // }
+    componentDidMount() {
+        if (this.props.addValidate && this.props.name) {
+            this.props.addValidate(this.props.name, this.isValid);
+        }
+    }
 
-    // componentWillUnmount() {
-    //     if (this.props.removeValidate && this.props.name) {
-    //         this.props.removeValidate(this.props.name);
-    //     }
-    // }
+    componentWillUnmount() {
+        if (this.props.removeValidate && this.props.name) {
+            this.props.removeValidate(this.props.name);
+        }
+    }
 
-    // componentDidUpdate(prevProps, prevState) {
-    //     if (prevState.invalid && (this.props.value && this.props.value.value) !== (prevProps.value && prevProps.value.value)) {
-    //         this.setState({invalid: false}); //eslint-disable-line react/no-did-update-set-state
-    //     }
-    // }
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.invalid && (this.props.value && this.props.value.value) !== (prevProps.value && prevProps.value.value)) {
+            this.setState({invalid: false}); //eslint-disable-line react/no-did-update-set-state
+        }
+    }
     handleChange = (value) => {
         if (this.props.onChange) {
             if (Array.isArray(value)) {
@@ -64,10 +63,6 @@ export default class ReactSelectSetting extends React.PureComponent {
                 this.props.onChange(this.props.name, newValue);
             }
         }
-
-        // if (this.props.resetInvalidOnChange) {
-        //     this.setState({invalid: false});
-        // }
     };
 
     filterOptions = (input) => {
@@ -78,16 +73,27 @@ export default class ReactSelectSetting extends React.PureComponent {
         return Promise.resolve(options.slice(0, MAX_NUM_OPTIONS));
     };
 
+    isValid = () => {
+        if (!this.props.required) {
+            return true;
+        }
+
+        const valid = Boolean(this.props.value);
+
+        this.setState({invalid: !valid});
+        return valid;
+    };
+
     render() {
-        // const requiredMsg = 'This field is required.';
-        // let validationError = null;
-        // if (this.props.required && this.state.invalid) {
-        //     validationError = (
-        //         <p className='help-text error-text'>
-        //             <span>{requiredMsg}</span>
-        //         </p>
-        //     );
-        // }
+        const requiredMsg = 'This field is required.';
+        let validationError = null;
+        if (this.props.required && this.state.invalid) {
+            validationError = (
+                <p className='help-text error-text'>
+                    <span>{requiredMsg}</span>
+                </p>
+            );
+        }
         let selectComponent = null;
         if (this.props.limitOptions && this.props.options.length > MAX_NUM_OPTIONS) {
             // The parent component has let us know that we may have a large number of options, and that
@@ -122,7 +128,7 @@ export default class ReactSelectSetting extends React.PureComponent {
                 {...this.props}
             >
                 {selectComponent}
-                {/* {validationError} */}
+                {validationError}
             </Setting>
         );
     }

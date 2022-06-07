@@ -6,7 +6,7 @@ import GitlabLabelSelector from 'components/gitlab_label_selector';
 import GitlabAssigneeSelector from 'components/gitlab_assignee_selector';
 import GitlabMilestoneSelector from 'components/gitlab_milestone_selector';
 import GitlabProjectSelector from 'components/gitlab_project_selector';
-// import Validator from 'components/validator';   
+import Validator from 'components/validator';   
 import FormButton from 'components/form_button';                                                                            
 import Input from 'components/input';
 import {getErrorMessage} from 'utils/user_utils';
@@ -40,7 +40,7 @@ export default class CreateIssueModal extends PureComponent {
     constructor(props) {
         super(props);
         this.state = initialState;
-        // this.validator = new Validator();
+        this.validator = new Validator();
     }
 
     componentDidUpdate(prevProps) {
@@ -56,13 +56,13 @@ export default class CreateIssueModal extends PureComponent {
     handleCreate = async (e) => {
         e.preventDefault();
 
-        // // if (!this.validator.validate() || !this.state.issueTitle) {
-        // //     this.setState({
-        // //         issueTitleValid: Boolean(this.state.issueTitle),
-        // //         showErrors: true,
-        // //     });
-        // //     return;
-        // // }
+        if (!this.validator.validate() || !this.state.issueTitle) {
+            this.setState({
+                issueTitleValid: Boolean(this.state.issueTitle),
+                showErrors: true,
+            });
+            return;
+        }
 
         const {post} = this.props;
         const postId = post?.id ?? '';
@@ -83,7 +83,6 @@ export default class CreateIssueModal extends PureComponent {
         const created = await this.props.create(issue);
         if (created.error) {
             const errMessage = getErrorMessage(created.error.message);
-            console.log("error",errMessage);
             this.setState({
                 error: errMessage,
                 showErrors: true,
@@ -91,7 +90,6 @@ export default class CreateIssueModal extends PureComponent {
             });
             return;
         }
-        console.log(created);
         this.handleClose(e);
     };
 
@@ -108,7 +106,12 @@ export default class CreateIssueModal extends PureComponent {
 
     handleMilestoneChange = (milestone) => this.setState({milestone});
 
-    handleIssueTitleChange = (issueTitle) => this.setState({issueTitle});
+    handleIssueTitleChange = (issueTitle) => {
+        this.setState({issueTitle})
+        if(issueTitle && !this.state.issueTitleValid){
+            this.setState({issueTitleValid:true})
+        }
+    };
 
     handleIssueDescriptionChange = (issueDescription) => this.setState({issueDescription});
 
@@ -181,8 +184,8 @@ export default class CreateIssueModal extends PureComponent {
                     value={this.state.project && this.state.project.name}
                     required={true}
                     theme={theme}
-                    // addValidate={this.validator.addComponent}
-                    // removeValidate={this.validator.removeComponent}
+                    addValidate={this.validator.addComponent}
+                    removeValidate={this.validator.removeComponent}
                 />
 
                 <Input
