@@ -182,9 +182,9 @@ export default class SidebarRight extends React.PureComponent<PropTypes> {
                       {!gitlabItems.length ? (<div style={style.container}>{'You have no active items'}</div>)
                       : gitlabItems.map((item)=>
                         <GitlabItems
-                          key={item.id}
-                          item={item}
-                          theme={this.props.theme}
+                            key={item.id}
+                            item={item}
+                            theme={this.props.theme}
                       />
                       )}
                       

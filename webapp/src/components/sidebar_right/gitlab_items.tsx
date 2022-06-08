@@ -11,16 +11,16 @@ import {formatTimeSince} from '../../utils/date_utils';
 import {GitlabItemsProps, Label} from "../../types/gitlab_items"
 
 export const notificationReasons: Record<string, string> = {
-  assigned: 'You were assigned to the issue/merge request',
-  review_requested: 'You were requested to review a merge request.',
-  mentioned: 'You were specifically @mentioned in the content.',
-  build_failed: 'Gitlab build was failed.',
-  marked: 'Task is marked as done.',
-  approval_required: 'Your approval is required on this issue/merge request.',
-  unmergeable: 'This merge request can not be merged.',
-  directly_addressed: 'You were directly addressed.',
-  merge_train_removed: 'A merge train was removed.',
-  attention_required: 'Your attention is required on the issue/merge request.',
+    assigned: 'You were assigned to the issue/merge request',
+    review_requested: 'You were requested to review a merge request.',
+    mentioned: 'You were specifically @mentioned in the content.',
+    build_failed: 'Gitlab build was failed.',
+    marked: 'Task is marked as done.',
+    approval_required: 'Your approval is required on this issue/merge request.',
+    unmergeable: 'This merge request can not be merged.',
+    directly_addressed: 'You were directly addressed.',
+    merge_train_removed: 'A merge train was removed.',
+    attention_required: 'Your attention is required on the issue/merge request.',
 };
 
 function GitlabItems({item, theme}: GitlabItemsProps) {
@@ -73,16 +73,16 @@ function GitlabItems({item, theme}: GitlabItemsProps) {
 
     const milestone: JSX.Element | null = item.milestone ? (
         <span
-          style={{
-            ...style.milestoneIcon,
-            ...style.icon,
-            ...((item.created_at || userName) && {
-              paddingLeft: 10,
-            }),
-          }}
+            style={{
+                ...style.milestoneIcon,
+                ...style.icon,
+                ...((item.created_at || userName) && {
+                    paddingLeft: 10,
+                }),
+            }}
         >
-          <SignIcon />
-          {item.milestone.title}
+            <SignIcon />
+            {item.milestone.title}
         </span>
       ) : null;
     

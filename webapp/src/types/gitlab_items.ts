@@ -7,25 +7,25 @@ export interface Label {
     name: string;
     color: CSS.Properties;
     text_color: CSS.Properties;
-  }
-  
-  export interface User {
+}
+
+export interface User {
     username: string;
-  }
-  
-  export interface References {
+}
+
+export interface References {
     full: string;
-  }
-  
-  export interface Project {
+}
+
+export interface Project {
     path_with_namespace: string;
-  }
-  
-  export interface Target {
+}
+
+export interface Target {
     title: string;
-  }
-  
-  export interface Item {
+}
+
+export interface Item {
     url: string;
     iid: number;
     project_id:number;
@@ -47,19 +47,18 @@ export interface Label {
     merge_error: string;
     owner?: User;
     milestone?: {
-      title: string;
+        title: string;
     };
     repository?: {
-      full_name: string;
+        full_name: string;
     };
     labels_with_details?: Label[];
     target: Target;
     approvers:number;
     total_reviewers:number;
-  }
-  
-  export interface GitlabItemsProps {
+}
+
+export interface GitlabItemsProps {
     item: Item;
     theme: Theme;
-  }
-  
+}
