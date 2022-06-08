@@ -9,6 +9,7 @@ import ReactSelectSetting from 'components/react_select_setting';
 const initialState = {
     invalid: false,
     error: null,
+    isLoading: false,
 };
 
 export default class GitlabProjectSelector extends PureComponent {
@@ -30,7 +31,14 @@ export default class GitlabProjectSelector extends PureComponent {
     }
 
     componentDidMount() {
-        this.props.actions.getProjects();
+        // this.props.actions.getProjects();
+        this.loadProjects();
+    }
+
+    loadProjects = async ()=>{
+        this.setState({isLoading:true})
+        await this.props.actions.getProjects();
+        this.setState({isLoading:false});
     }
 
     onChange = (_, name) => {
@@ -51,6 +59,7 @@ export default class GitlabProjectSelector extends PureComponent {
                     options={projectOptions}
                     isMulti={false}
                     key={'project'}
+                    isLoading={this.state.isLoading}
                     theme={this.props.theme}
                     addValidate={this.props.addValidate}
                     removeValidate={this.props.removeValidate}

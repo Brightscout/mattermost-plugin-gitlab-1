@@ -19,6 +19,7 @@ export default class ReactSelectSetting extends React.PureComponent {
         theme: PropTypes.object.isRequired,
         isClearable: PropTypes.bool,
         options: PropTypes.array.isRequired,
+        isLoading: PropTypes.bool,
         value: PropTypes.oneOfType([
             PropTypes.object,
             PropTypes.array,
@@ -107,6 +108,7 @@ export default class ReactSelectSetting extends React.PureComponent {
                     menuPortalTarget={document.body}
                     menuPlacement='auto'
                     onChange={this.handleChange}
+                    isLoading={this.props.isLoading}
                     styles={getStyleForReactSelect(this.props.theme)}
                 />
             );
@@ -116,6 +118,7 @@ export default class ReactSelectSetting extends React.PureComponent {
                     {...this.props}
                     menuPortalTarget={document.body}
                     menuPlacement='auto'
+                    isLoading={this.props.isLoading}
                     onChange={this.handleChange}
                     styles={getStyleForReactSelect(this.props.theme)}
                 />

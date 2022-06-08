@@ -92,7 +92,7 @@ func (p *Plugin) getCommand(config *configuration) (*model.Command, error) {
 	return &model.Command{
 		Trigger:              "gitlab",
 		AutoComplete:         true,
-		AutoCompleteDesc:     "Available commands: connect, disconnect, todo, me, settings, subscriptions, webhook, and help",
+		AutoCompleteDesc:     "Available commands: connect, disconnect, todo, me, settings, subscriptions, webhook and help",
 		AutoCompleteHint:     "[command]",
 		AutocompleteData:     getAutocompleteData(config),
 		AutocompleteIconData: iconData,
@@ -137,6 +137,14 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 
 	if action == "setup" {
 		message := p.handleSetup(c, args, parameters)
+		if message != "" {
+			p.postCommandResponse(args, message)
+		}
+		return &model.CommandResponse{}, nil
+	}
+
+	if action == "issue" {
+		message := p.handleIssue(c, args, parameters)
 		if message != "" {
 			p.postCommandResponse(args, message)
 		}
@@ -312,6 +320,23 @@ func (p *Plugin) handleSetup(c *plugin.Context, args *model.CommandArgs, paramet
 	}
 
 	return ""
+}
+
+func (p *Plugin) handleIssue(_ *plugin.Context, args *model.CommandArgs, parameters []string) string {
+	if len(parameters) == 0 {
+		return "Invalid issue command. Available command is 'create'."
+	}
+
+	command := parameters[0]
+	parameters = parameters[1:]
+
+	switch {
+	case command == "create":
+		p.openIssueCreateModal(args.UserId, args.ChannelId, strings.Join(parameters, " "))
+		return ""
+	default:
+		return fmt.Sprintf("Unknown subcommand %v", command)
+	}
 }
 
 // webhookCommand processes the /gitlab webhook commands
@@ -618,7 +643,7 @@ func getAutocompleteData(config *configuration) *model.AutocompleteData {
 		return gitlab
 	}
 
-	gitlab := model.NewAutocompleteData("gitlab", "[command]", "Available commands: connect, disconnect, todo, subscribe, unsubscribe, me, settings, webhook, setup")
+	gitlab := model.NewAutocompleteData("gitlab", "[command]", "Available commands: connect, disconnect, todo, subscribe, unsubscribe, me, settings, webhook, setup, issue")
 
 	connect := model.NewAutocompleteData("connect", "", "Connect your GitLab account")
 	gitlab.AddCommand(connect)
@@ -628,6 +653,12 @@ func getAutocompleteData(config *configuration) *model.AutocompleteData {
 
 	todo := model.NewAutocompleteData("todo", "", "Get a list of unread messages and merge requests awaiting your review")
 	gitlab.AddCommand(todo)
+
+	issue := model.NewAutocompleteData("issue", "[command]", "Available commands: create")
+	gitlab.AddCommand(issue)
+
+	create := model.NewAutocompleteData("create", "[title]", "Open a dialog to create a new issue in Gitlab, using the title is provided")
+	issue.AddCommand(create)
 
 	subscriptions := model.NewAutocompleteData("subscriptions", "[command]", "Available commands: Add, List, Delete")
 

@@ -6,6 +6,7 @@ import {
     getUnreads,
     getYourPrs,
     getYourAssignments,
+    openCreateIssueModalWithoutPost,
 } from '../actions';
 import {id} from '../manifest';
 
@@ -65,5 +66,15 @@ export function handleRefresh(store) {
             getYourPrs()(store.dispatch, store.getState);
             getYourAssignments()(store.dispatch, store.getState);
         }
+    };
+}
+
+export function handleOpenCreateIssueModal(store) {
+    console.log("websocket event fired");
+    return (msg) => {
+        if (!msg.data) {
+            return;
+        }
+        store.dispatch(openCreateIssueModalWithoutPost(msg.data.title, msg.data.channel_id));
     };
 }

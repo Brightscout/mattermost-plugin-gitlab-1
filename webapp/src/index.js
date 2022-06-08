@@ -14,6 +14,7 @@ import {
     handleDisconnect,
     handleReconnect,
     handleRefresh,
+    handleOpenCreateIssueModal,
 } from './websocket';
 import {id} from './manifest';
 import Client from './client';
@@ -52,6 +53,10 @@ class PluginClass {
         registry.registerWebSocketEventHandler(
             `custom_${id}_gitlab_refresh`,
             handleRefresh(store),
+        );
+        registry.registerWebSocketEventHandler(
+            `custom_${id}_createIssue`,
+            handleOpenCreateIssueModal(store)
         );
         registry.registerReconnectHandler(handleReconnect(store));
 
