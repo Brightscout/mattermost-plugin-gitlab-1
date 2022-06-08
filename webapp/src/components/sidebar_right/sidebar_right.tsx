@@ -7,7 +7,7 @@ import {Theme} from 'mattermost-redux/types/preferences';
 import {makeStyleFromTheme, changeOpacity} from 'mattermost-redux/utils/theme_utils';
 
 import {RHSStates} from '../../constants';
-import GitlabItems from '../sidebar_right/gitlab_items';
+import GitlabItems from './gitlab_items';
 import {Item} from '../../types/gitlab_items';
 
 interface PropTypes {
@@ -48,35 +48,35 @@ export function renderThumbVertical(props: PropTypes) {
 }
 
 
-function mapGitlabItemListToPrList(gilist:Item[]) {
+function mapGitlabItemListToPrList(gilist: Item[]) {
     if (!gilist) {
         return [];
     }
 
-    return gilist.map((pr:Item) => {
+    return gilist.map((pr: Item) => {
         return {sha: pr.sha, project_id: pr.project_id, iid: pr.iid};
     });
 }
 
-function shouldUpdateDetails(prs:Item[], prevPrs:Item[], targetState:string, currentState:string, prevState:string) {
-    if (currentState === targetState) {
-        if (currentState !== prevState) {
-            return true;
-        }
+function shouldUpdateDetails(prs: Item[], prevPrs: Item[], targetState: string, currentState: string, prevState: string) {
+    if (currentState !== targetState) {
+        return false
+    }
 
-        if (prs.length !== prevPrs.length) {
-            return true;
-        }
+    if (currentState !== prevState) {
+        return true;
+    }
 
-        for (let i = 0; i < prs.length; i++) {
-            if (prs[i].id !== prevPrs[i].id) {
-                return true;
-            }
+    if (prs.length !== prevPrs.length) {
+        return true;
+    }
+
+    for (let i = 0; i < prs.length; i++) {
+        if (prs[i].id !== prevPrs[i].id) {
+            return true;
         }
     }
-    return false;
 }
-
 
 export default class SidebarRight extends React.PureComponent<PropTypes> {
 

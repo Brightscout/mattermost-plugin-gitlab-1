@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
+	"github.com/mattermost/mattermost-plugin-api/experimental/bot/logger"
 
 	"github.com/pkg/errors"
 	internGitlab "github.com/xanzy/go-gitlab"
@@ -24,10 +25,10 @@ type Gitlab interface {
 	GetCurrentUser(ctx context.Context, userID string, token oauth2.Token) (*UserInfo, error)
 	GetUserDetails(ctx context.Context, user *UserInfo) (*internGitlab.User, error)
 	GetProject(ctx context.Context, user *UserInfo, owner, repo string) (*internGitlab.Project, error)
-	GetReviews(ctx context.Context, user *UserInfo) ([]*internGitlab.MergeRequest, error)
-	GetYourPrs(ctx context.Context, user *UserInfo) ([]*internGitlab.MergeRequest, error)
-	GetYourPrDetails(ctx context.Context, user *UserInfo, prList []*PRDetails) ([]*PRDetails, error)
 	CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRequest) (*internGitlab.Issue, error)
+	GetYourPrDetails(ctx context.Context,log logger.Logger, user *UserInfo, prList []*PRDetails) ([]*PRDetails, error)
+	GetReviews(ctx context.Context, user *UserInfo) ([]*GitlabMergeRequest, error)
+	GetYourPrs(ctx context.Context, user *UserInfo) ([]*GitlabMergeRequest, error)
 	GetYourAssignments(ctx context.Context, user *UserInfo) ([]*internGitlab.Issue, error)
 	GetYourProjects(ctx context.Context, user *UserInfo) ([]*internGitlab.Project, error)
 	GetUnreads(ctx context.Context, user *UserInfo) ([]*internGitlab.Todo, error)
@@ -41,7 +42,7 @@ type Gitlab interface {
 	// ResolveNamespaceAndProject accepts full path to User, Group or namespaced Project and returns corresponding
 	// namespace and project name.
 	//
-	// ErrNotFound wil	l be returned if no resource can be found.
+	// ErrNotFound will be returned if no resource can be found.
 	// If allowPrivate is set to false, and resolved group/project is private, ErrPrivateResource will be returned.
 	ResolveNamespaceAndProject(
 		ctx context.Context,

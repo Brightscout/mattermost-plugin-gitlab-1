@@ -79,7 +79,7 @@ export function getReviewsDetails(prList) {
         }
 
         dispatch({
-            type: ActionTypes.RECEIVED_REVIEWS_DETAILS,
+            type: ActionTypes.RECEIVED_REVIEW_DETAILS,
             data,
         });
 
@@ -127,7 +127,7 @@ export function getYourPrsDetails(prList) {
         }
 
         dispatch({
-            type: ActionTypes.RECEIVED_YOUR_PRS_DETAILS,
+            type: ActionTypes.RECEIVED_YOUR_PR_DETAILS,
             data,
         });
 

@@ -52,11 +52,11 @@ export interface Item {
     repository?: {
         full_name: string;
     };
-    labels?: Label[];
+    labels_with_details?: Label[];
     target: Target;
     approvers: number;
     total_reviewers: number;
-  }
+}
 
 export interface GitlabItemsProps {
     item: Item;

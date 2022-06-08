@@ -11,16 +11,16 @@ import {formatTimeSince} from '../../utils/date_utils';
 import {GitlabItemsProps, Label} from "../../types/gitlab_items"
 
 export const notificationReasons: Record<string, string> = {
-  assigned: 'You were assigned to the issue/merge request',
-  review_requested: 'You were requested to review a merge request.',
-  mentioned: 'You were specifically @mentioned in the content.',
-  build_failed: 'Gitlab build was failed.',
-  marked: 'Task is marked as done.',
-  approval_required: 'Your approval is required on this issue/merge request.',
-  unmergeable: 'This merge request can not be merged.',
-  directly_addressed: 'You were directly addressed.',
-  merge_train_removed: 'A merge train was removed.',
-  attention_required: 'Your attention is required on the issue/merge request.',
+    assigned: 'You were assigned to the issue/merge request',
+    review_requested: 'You were requested to review a merge request.',
+    mentioned: 'You were specifically @mentioned in the content.',
+    build_failed: 'Gitlab build was failed.',
+    marked: 'Task is marked as done.',
+    approval_required: 'Your approval is required on this issue/merge request.',
+    unmergeable: 'This merge request can not be merged.',
+    directly_addressed: 'You were directly addressed.',
+    merge_train_removed: 'A merge train was removed.',
+    attention_required: 'Your attention is required on the issue/merge request.',
 };
 
 function GitlabItems({item, theme}: GitlabItemsProps) {
@@ -84,67 +84,68 @@ function GitlabItems({item, theme}: GitlabItemsProps) {
             <SignIcon />
             {item.milestone.title}
         </span>
-      ):null;
+      ) : null;
     
-    let labels: JSX.Element[] | null = item.labels?getGitlabLabels(item.labels):null;
+    let labels: JSX.Element[] | null = item.labels_with_details ? getGitlabLabels(item.labels_with_details) : null;
 
     let hasConflict: JSX.Element | null = null;
-            if (item.has_conflicts) {
-                hasConflict = (
-                    <OverlayTrigger
-                        key="gitlabRHSPRMergeableIndicator"
-                        placement="top"
-                        overlay={
-                            <Tooltip id="gitlabRHSPRMergeableTooltip">
-                                {
-                                    "This merge request has conflicts that must be resolved"
-                                }
-                            </Tooltip>
+    if (item.has_conflicts) {
+        hasConflict = (
+            <OverlayTrigger
+                key="gitlabRHSPRMergeableIndicator"
+                placement="top"
+                overlay={
+                    <Tooltip id="gitlabRHSPRMergeableTooltip">
+                        {
+                            "This merge request has conflicts that must be resolved"
                         }
-                    >
-                        <i
-                            style={style.conflictIcon}
-                            className="icon icon-alert-outline"
-                        />
-                    </OverlayTrigger>
-                );
-            }
-            let status: JSX.Element | null = null;
-            if (item.status) {
-                switch (item.status) {
-                    case "success":
-                        status = (
-                            <span
-                                style={{ ...style.icon, ...style.iconSuccess }}
-                            >
-                                <TickIcon />
-                            </span>
-                        );
-                        break;
-                    case "pending":
-                        status = (
-                            <span
-                                style={{ ...style.icon, ...style.iconPending }}
-                            >
-                                <DotIcon />
-                            </span>
-                        );
-                        break;
-                    default:
-                        status = (
-                            <span
-                                style={{ ...style.icon, ...style.iconFailed }}
-                            >
-                                <CrossIcon />
-                            </span>
-                        );
+                    </Tooltip>
                 }
-            }
+            >
+                <i
+                    style={style.conflictIcon}
+                    className="icon icon-alert-outline"
+                />
+            </OverlayTrigger>
+        );
+    }
+
+    let status: JSX.Element | null = null;
+    if (item.status) {
+        switch (item.status) {
+            case "success":
+                status = (
+                    <span
+                        style={{ ...style.icon, ...style.iconSuccess }}
+                    >
+                        <TickIcon />
+                    </span>
+                );
+                break;
+            case "pending":
+                status = (
+                    <span
+                        style={{ ...style.icon, ...style.iconPending }}
+                    >
+                        <DotIcon />
+                    </span>
+                );
+                break;
+            default:
+                status = (
+                    <span
+                        style={{ ...style.icon, ...style.iconFailed }}
+                    >
+                        <CrossIcon />
+                    </span>
+                );
+        }
+    }
         
     const reviews = (
       <div style={style.subtitle}>
           <span className="light">
-              {`${item.approvers} out of ${item.total_reviewers} ${(item.total_reviewers>1?"reviews":"review")} complete.`}
+              {`${item.approvers} out of ${item.total_reviewers} ${(item.total_reviewers>1 ? "reviews" : "review")} complete.`}
           </span>
       </div>
     )
