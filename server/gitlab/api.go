@@ -7,6 +7,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/mattermost/mattermost-plugin-api/experimental/bot/logger"
+
 	"github.com/pkg/errors"
 	internGitlab "github.com/xanzy/go-gitlab"
 	"golang.org/x/sync/errgroup"
@@ -377,7 +379,7 @@ func (g *gitlab) GetLabelDetails(client *internGitlab.Client, pid int, labels in
 	return labelsWithDetails, nil
 }
 
-func (g *gitlab) GetYourPrDetails(ctx context.Context, user *UserInfo, prList []*PRDetails) ([]*PRDetails, error) {
+func (g *gitlab) GetYourPrDetails(ctx context.Context, log logger.Logger, user *UserInfo, prList []*PRDetails) ([]*PRDetails, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
 		return nil, err
@@ -386,27 +388,19 @@ func (g *gitlab) GetYourPrDetails(ctx context.Context, user *UserInfo, prList []
 	var wg sync.WaitGroup
 	for _, pr := range prList {
 		wg.Add(1)
-		// var pid interface{} = pr.ProjectID
-		var pid = pr.ProjectID
-		var sha = pr.SHA
-		var iid = pr.IID
-		var res *PRDetails
-		go func() {
+		go func(pid int, sha string, iid int) {
 			defer wg.Done()
-			res, _ = g.fetchYourPrDetails(ctx, client, pid, sha, iid)
-			// if err == nil {
-			result = append(result, res)
-			// }
-		}()
-		// if err != nil {
-		// 	return nil, err
-		// }
+			res := g.fetchYourPrDetails(ctx, log, client, pid, sha, iid)
+			if res != nil {
+				result = append(result, res)
+			}
+		}(pr.ProjectID, pr.SHA, pr.IID)
 	}
 	wg.Wait()
 	return result, nil
 }
 
-func (g *gitlab) fetchYourPrDetails(c context.Context, client *internGitlab.Client, pid int, sha string, iid int) (*PRDetails, error) {
+func (g *gitlab) fetchYourPrDetails(c context.Context, log logger.Logger, client *internGitlab.Client, pid int, sha string, iid int) *PRDetails {
 	var commitDetails *internGitlab.Commit
 	var approvalDetails *internGitlab.MergeRequestApprovals
 	var err error
@@ -416,34 +410,40 @@ func (g *gitlab) fetchYourPrDetails(c context.Context, client *internGitlab.Clie
 	go func() {
 		defer wg.Done()
 		commitDetails, resp, err = client.Commits.GetCommit(pid, sha, internGitlab.WithContext(c))
+		if respErr := checkResponse(resp); respErr != nil {
+			log.WithError(respErr).Warnf("Failed to fetch commit details for PR")
+			return
+		}
+		if err != nil {
+			log.WithError(err).Warnf("Failed to fetch commit details for PR")
+			return
+		}
 	}()
-	if respErr := checkResponse(resp); respErr != nil {
-		return nil, errors.Wrap(respErr, "Failed to fetch commit details for PR")
-	}
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to fetch commit details for PR")
-	}
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		approvalDetails, resp, err = client.MergeRequestApprovals.GetConfiguration(pid, iid, internGitlab.WithContext(c))
+		if respErr := checkResponse(resp); respErr != nil {
+			log.WithError(respErr).Warnf("Failed to fetch approval details for PR")
+			return
+		}
+		if err != nil {
+			log.WithError(err).Warnf("Failed to fetch approval details for PR")
+			return
+		}
 	}()
-	if respErr := checkResponse(resp); respErr != nil {
-		return nil, errors.Wrap(respErr, "Failed to fetch approval details for PR")
-	}
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to fetch approval details for PR")
-	}
 
 	wg.Wait()
-
-	return &PRDetails{
-		ProjectID: pid,
-		SHA:       sha,
-		Status:    commitDetails.Status,
-		Approvers: len(approvalDetails.ApprovedBy),
-	}, nil
+	if commitDetails != nil && approvalDetails != nil {
+		return &PRDetails{
+			ProjectID: pid,
+			SHA:       sha,
+			Status:    commitDetails.Status,
+			Approvers: len(approvalDetails.ApprovedBy),
+		}
+	}
+	return nil
 }
 
 func (g *gitlab) GetYourAssignments(ctx context.Context, user *UserInfo) ([]*internGitlab.Issue, error) {
