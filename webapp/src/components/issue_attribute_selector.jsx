@@ -67,15 +67,15 @@ export default class IssueAttributeSelector extends PureComponent {
 
     filterSelection = (options) => {
         if (this.props.isMulti) {
-            const sele = [];
+            const newSelection = [];
             for (let i = 0; i < this.props.selection?.length; i++) {
                 for (let j = 0; j < options.length; j++) {
                     if (options[j].value === this.props.selection[i].value) {
-                        sele.push(options[j]);
+                        newSelection.push(options[j]);
                     }
                 }
             }
-            const filtered = sele;
+            const filtered = newSelection;
             this.props.onChange(filtered);
             return;
         }
@@ -113,7 +113,6 @@ export default class IssueAttributeSelector extends PureComponent {
     };
 
     render() {
-
         const noOptionsMessage = this.props.projectName ? 'No options' : 'Please select a project first';
 
         return (
