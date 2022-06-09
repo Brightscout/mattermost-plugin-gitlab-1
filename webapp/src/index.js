@@ -9,6 +9,7 @@ import SidebarRight from './components/sidebar_right';
 import CreateIssuePostMenuAction from './components/create_issue_menu';
 import AttachCommentToIssuePostMenuAction from './components/attach_comment_to_issue_menu';
 import CreateIssueModal from './components/modals/create_issue';
+import AttachCommentToIssueModal from './components/modals/attach_comment_to_issue';
 import {getConnected, setShowRHSAction} from './actions';
 import {
     handleConnect,
@@ -39,6 +40,7 @@ class PluginClass {
         registry.registerPopoverUserAttributesComponent(UserAttribute);
         registry.registerRootComponent(CreateIssueModal);
         registry.registerPostDropdownMenuComponent(CreateIssuePostMenuAction);
+        registry.registerRootComponent(AttachCommentToIssueModal);
         registry.registerPostDropdownMenuComponent(AttachCommentToIssuePostMenuAction);
 
         const {showRHSPlugin} = registry.registerRightHandSidebarComponent(SidebarRight, 'GitLab Plugin');

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
+
 	"github.com/mattermost/mattermost-plugin-api/experimental/bot/logger"
 
 	"github.com/pkg/errors"
@@ -26,7 +27,8 @@ type Gitlab interface {
 	GetUserDetails(ctx context.Context, user *UserInfo) (*internGitlab.User, error)
 	GetProject(ctx context.Context, user *UserInfo, owner, repo string) (*internGitlab.Project, error)
 	CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRequest) (*internGitlab.Issue, error)
-	GetYourPrDetails(ctx context.Context,log logger.Logger, user *UserInfo, prList []*PRDetails) ([]*PRDetails, error)
+	SearchIssues(ctx context.Context, user *UserInfo, search string) ([]*internGitlab.Issue, error)
+	GetYourPrDetails(ctx context.Context, log logger.Logger, user *UserInfo, prList []*PRDetails) ([]*PRDetails, error)
 	GetReviews(ctx context.Context, user *UserInfo) ([]*GitlabMergeRequest, error)
 	GetYourPrs(ctx context.Context, user *UserInfo) ([]*GitlabMergeRequest, error)
 	GetYourAssignments(ctx context.Context, user *UserInfo) ([]*internGitlab.Issue, error)
