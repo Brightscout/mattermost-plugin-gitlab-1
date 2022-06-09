@@ -2,21 +2,25 @@
 // See LICENSE.txt for license information.
 
 import React, {PureComponent} from 'react';
-import PropTypes from 'prop-types';
+import {Theme} from 'mattermost-redux/types/preferences';
 
-import IssueAttributeSelector from 'components/issue_attribute_selector';
+import IssueAttributeSelector from '../issue_attribute_selector';
 
-export default class GitlabMilestoneSelector extends PureComponent {
-    static propTypes = {
-        projectID: PropTypes.number.isRequired,
-        projectName: PropTypes.string.isRequired,
-        theme: PropTypes.object.isRequired,
-        selectedMilestone: PropTypes.object,
-        onChange: PropTypes.func.isRequired,
-        actions: PropTypes.shape({
-            getMilestoneOptions: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+interface PropTypes{
+    projectID: number;
+    projectName: string;
+    theme: Theme;
+    selectedMilestone: any;
+    onChange: any;
+    actions: any;
+};
+
+interface Milestone{
+    id: number;
+    title: string;
+}
+
+export default class GitlabMilestoneSelector extends PureComponent<PropTypes> {
 
     loadMilestones = async () => {
         if (this.props.projectName === '') {
@@ -33,7 +37,7 @@ export default class GitlabMilestoneSelector extends PureComponent {
             return [];
         }
 
-        return options.data.map((option) => ({
+        return options.data.map((option: Milestone) => ({
             value: option.id,
             label: option.title,
         }));

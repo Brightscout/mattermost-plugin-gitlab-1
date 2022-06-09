@@ -18,9 +18,13 @@ const mapStateToProps = (state) => {
     };
 };
 
-const mapDispatchToProps = (dispatch) => bindActionCreators({
-    close: closeCreateIssueModal,
-    create: createIssue,
-}, dispatch);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        actions: bindActionCreators({
+            close: closeCreateIssueModal,
+            create: createIssue,
+        }, dispatch),
+    };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateIssueModal);

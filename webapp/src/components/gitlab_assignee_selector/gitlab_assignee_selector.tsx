@@ -10,10 +10,20 @@ interface PropTypes{
     projectID: number;
     projectName: string;
     theme: Theme;
-    selectedAssignees: string[];
+    selectedAssignees: any;
     onChange: any;
     actions: any;
 };
+
+interface Assignee{
+    id: number;
+    username: string;
+}
+
+interface Selection{
+    value: number;
+    label: string;
+}
 
 export default class GitlabAssigneeSelector extends PureComponent<PropTypes> {
 
@@ -31,14 +41,13 @@ export default class GitlabAssigneeSelector extends PureComponent<PropTypes> {
         if (!options || !options.data) {
             return [];
         }
-        return options.data.map((option:any) => ({
+        return options.data.map((option: Assignee) => ({
             value: option.id,
             label: option.username,
         }));
     };
 
-    // onChange = (selection:any) => this.props.onChange(selection.map((s:any) => s.value));
-    onChange = (selection:any) => this.props.onChange(selection);
+    onChange = (selection: Selection) => this.props.onChange(selection);
 
     render() {
         return (

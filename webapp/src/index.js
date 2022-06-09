@@ -56,7 +56,7 @@ class PluginClass {
         );
         registry.registerWebSocketEventHandler(
             `custom_${id}_createIssue`,
-            handleOpenCreateIssueModal(store)
+            handleOpenCreateIssueModal(store),
         );
         registry.registerReconnectHandler(handleReconnect(store));
 

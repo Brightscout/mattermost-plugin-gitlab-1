@@ -2,20 +2,20 @@
 // See LICENSE.txt for license information.
 
 import React from 'react';
-import GitLabIcon from '../icon';
+import GitLabIcon from '../../images/icons/gitlab';
 
 interface PropTypes{
     show: boolean;
-    open: any;
+    actions: any;
     postId: string;
 }
 
 export default class CreateIssuePostMenuAction extends React.PureComponent<PropTypes> {
 
     handleClick = (e:any) => {        
-        const {open, postId} = this.props;
+        const {postId} = this.props;
         e.preventDefault();
-        open(postId);
+        this.props.actions.open(postId);
     };
 
     render() {

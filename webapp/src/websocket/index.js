@@ -70,7 +70,6 @@ export function handleRefresh(store) {
 }
 
 export function handleOpenCreateIssueModal(store) {
-    console.log("websocket event fired");
     return (msg) => {
         if (!msg.data) {
             return;

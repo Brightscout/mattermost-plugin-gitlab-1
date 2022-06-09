@@ -67,16 +67,15 @@ export default class IssueAttributeSelector extends PureComponent {
 
     filterSelection = (options) => {
         if (this.props.isMulti) {
-            let sele = [];
-            for(let i=0;i<this.props.selection?.length;i++){
-                for(let j=0;j<options.length;j++){
-                    if(options[j].value === this.props.selection[i].value){
-                        sele.push(options[j])
+            const sele = [];
+            for (let i = 0; i < this.props.selection?.length; i++) {
+                for (let j = 0; j < options.length; j++) {
+                    if (options[j].value === this.props.selection[i].value) {
+                        sele.push(options[j]);
                     }
                 }
-            }  
+            }
             const filtered = sele;
-            // const filtered = options.filter((option) => this.props.selection.includes(option.value));
             this.props.onChange(filtered);
             return;
         }
@@ -97,36 +96,23 @@ export default class IssueAttributeSelector extends PureComponent {
     }
 
     onChange = (selection) => {
-          
         if (this.props.isMulti) {
-            let sele = [];
-        for(let i=0;i<selection?.length;i++){
-            for(let j=0;j<this.state.options?.length;j++){
-                if(this.state.options[j].value === selection[i].value){
-                    sele.push(this.state.options[j])
+            const newSelection = [];
+            for (let i = 0; i < selection?.length; i++) {
+                for (let j = 0; j < this.state.options?.length; j++) {
+                    if (this.state.options[j].value === selection[i].value) {
+                        newSelection.push(this.state.options[j]);
+                    }
                 }
             }
-        } 
-            this.props.onChange(sele || []);
+            this.props.onChange(newSelection || []);
             return;
         }
 
-        this.props.onChange(this.state.options.find((option)=>option?.value===selection?.value));
-        // if (this.props.isMulti) {
-        //     this.props.onChange(selection || []);
-        //     return;
-        // }
-
-        // this.props.onChange(selection);
+        this.props.onChange(this.state.options.find((option) => option?.value === selection?.value));
     };
 
     render() {
-        let selection;
-        if (this.props.isMulti) {
-            selection = this.props.selection.map((s) => ({label: s.label, value: s.label}));
-        } else {
-            selection = this.props.selection ?? {};
-        }
 
         const noOptionsMessage = this.props.projectName ? 'No options' : 'Please select a project first';
 

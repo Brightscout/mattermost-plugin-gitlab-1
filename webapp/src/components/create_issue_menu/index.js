@@ -20,8 +20,12 @@ const mapStateToProps = (state, ownProps) => {
     };
 };
 
-const mapDispatchToProps = (dispatch) => bindActionCreators({
-    open: openCreateIssueModal,
-}, dispatch);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        actions: bindActionCreators({
+            open: openCreateIssueModal,
+        }, dispatch),
+    };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateIssuePostMenuAction);

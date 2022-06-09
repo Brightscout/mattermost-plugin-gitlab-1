@@ -7,7 +7,7 @@ import {bindActionCreators} from 'redux';
 import {id as pluginId} from 'manifest';
 import {getProjects} from '../../actions';
 
-import GithubProjectSelector from './gitlab_project_selector.jsx';
+import GithubProjectSelector from './gitlab_project_selector.tsx';
 
 function mapStateToProps(state) {
     return {

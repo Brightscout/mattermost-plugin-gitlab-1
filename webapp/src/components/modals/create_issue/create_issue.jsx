@@ -6,8 +6,8 @@ import GitlabLabelSelector from 'components/gitlab_label_selector';
 import GitlabAssigneeSelector from 'components/gitlab_assignee_selector';
 import GitlabMilestoneSelector from 'components/gitlab_milestone_selector';
 import GitlabProjectSelector from 'components/gitlab_project_selector';
-import Validator from 'components/validator';   
-import FormButton from 'components/form_button';                                                                            
+import Validator from 'components/validator';
+import FormButton from 'components/form_button';
 import Input from 'components/input';
 import {getErrorMessage} from 'utils/user_utils';
 
@@ -26,6 +26,34 @@ const initialState = {
     issueTitleValid: true,
 };
 
+// interface StateTypes{
+//     submitting: boolean;
+//     error: string|null;
+//     project: any;
+//     issueTitle: string;
+//     issueDescription: string;
+//     labels: any;
+//     assignees: any;
+//     milestone: any;
+//     showErrors: boolean;
+//     issueTitleValid: boolean;
+// }
+
+// interface PropTypes{
+//     channelId: string;
+//     title: string;
+//     post: any;
+//     theme: Theme;
+//     visible: boolean;
+//     actions: any;
+// };
+
+// interface ValidatorTypes{
+//     validate: any;
+//     addComponent: any;
+//     removeComponent: any;
+// }
+
 export default class CreateIssueModal extends PureComponent {
     static propTypes = {
         close: PropTypes.func.isRequired,
@@ -35,6 +63,10 @@ export default class CreateIssueModal extends PureComponent {
         channelId: PropTypes.string,
         theme: PropTypes.object.isRequired,
         visible: PropTypes.bool.isRequired,
+        actions: PropTypes.shape({
+            close: PropTypes.func.isRequired,
+            create: PropTypes.func.isRequired,
+        }).isRequired,
     };
 
     constructor(props) {
@@ -71,8 +103,8 @@ export default class CreateIssueModal extends PureComponent {
             title: this.state.issueTitle,
             description: this.state.issueDescription,
             project_id: this.state.project?.project_id,
-            labels: this.state.labels.map((label)=>label.value),
-            assignees: this.state.assignees.map((assignee)=>assignee.value),
+            labels: this.state.labels.map((label) => label.value),
+            assignees: this.state.assignees.map((assignee) => assignee.value),
             milestone: this.state.milestone?.value,
             post_id: postId,
             channel_id: this.props.channelId,
@@ -80,7 +112,7 @@ export default class CreateIssueModal extends PureComponent {
 
         this.setState({submitting: true});
 
-        const created = await this.props.create(issue);
+        const created = await this.props.actions.create(issue);
         if (created.error) {
             const errMessage = getErrorMessage(created.error.message);
             this.setState({
@@ -95,7 +127,7 @@ export default class CreateIssueModal extends PureComponent {
 
     handleClose = (e) => {
         e.preventDefault();
-        this.setState(initialState, this.props.close);
+        this.setState(initialState, this.props.actions.close);
     };
 
     handleProjectChange = (project) => this.setState({project});
@@ -107,9 +139,9 @@ export default class CreateIssueModal extends PureComponent {
     handleMilestoneChange = (milestone) => this.setState({milestone});
 
     handleIssueTitleChange = (issueTitle) => {
-        this.setState({issueTitle})
-        if(issueTitle && !this.state.issueTitleValid){
-            this.setState({issueTitleValid:true})
+        this.setState({issueTitle});
+        if (issueTitle && !this.state.issueTitleValid) {
+            this.setState({issueTitleValid: true});
         }
     };
 
@@ -123,7 +155,7 @@ export default class CreateIssueModal extends PureComponent {
         return (
             <>
                 <GitlabLabelSelector
-                    projectID = {this.state.project?.project_id}
+                    projectID={this.state.project?.project_id}
                     projectName={this.state.project.name}
                     theme={this.props.theme}
                     selectedLabels={this.state.labels}
@@ -131,7 +163,7 @@ export default class CreateIssueModal extends PureComponent {
                 />
 
                 <GitlabAssigneeSelector
-                    projectID = {this.state.project?.project_id}
+                    projectID={this.state.project?.project_id}
                     projectName={this.state.project.name}
                     theme={this.props.theme}
                     selectedAssignees={this.state.assignees}
@@ -139,7 +171,7 @@ export default class CreateIssueModal extends PureComponent {
                 />
 
                 <GitlabMilestoneSelector
-                    projectID = {this.state.project?.project_id}
+                    projectID={this.state.project?.project_id}
                     projectName={this.state.project.name}
                     theme={this.props.theme}
                     selectedMilestone={this.state.milestone}
@@ -238,13 +270,11 @@ export default class CreateIssueModal extends PureComponent {
                     <Modal.Footer>
                         {submitError}
                         <FormButton
-                            type='button'
                             btnClass='btn-link'
                             defaultMessage='Cancel'
                             onClick={this.handleClose}
                         />
                         <FormButton
-                            type='submit'
                             btnClass='btn btn-primary'
                             saving={submitting}
                             defaultMessage='Submit'

@@ -2,22 +2,30 @@
 // See LICENSE.txt for license information.
 
 import React, {PureComponent} from 'react';
-import PropTypes from 'prop-types';
+import {Theme} from 'mattermost-redux/types/preferences';
 
-import IssueAttributeSelector from 'components/issue_attribute_selector';
+import IssueAttributeSelector from '../issue_attribute_selector';
 
-export default class GitlabLabelSelector extends PureComponent {
-    static propTypes = {
-        projectID: PropTypes.number.isRequired,
-        projectName: PropTypes.string.isRequired,
-        theme: PropTypes.object.isRequired,
-        selectedLabels: PropTypes.array.isRequired,
-        onChange: PropTypes.func.isRequired,
-        actions: PropTypes.shape({
-            getLabelOptions: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+interface PropTypes{
+    projectID: number;
+    projectName: string;
+    theme: Theme;
+    selectedLabels: any;
+    onChange: any;
+    actions: any;
+};
 
+interface Label{
+    name: string;
+}
+
+interface Selection{
+    value: string;
+    label: string;
+}
+
+export default class GitlabLabelSelector extends PureComponent<PropTypes> {
+   
     loadLabels = async () => {
         if (this.props.projectName === '') {
             return [];
@@ -31,15 +39,13 @@ export default class GitlabLabelSelector extends PureComponent {
         if (!options || !options.data) {
             return [];
         }
-        return options.data.map((option) => ({
+        return options.data.map((option: Label) => ({
             value: option.name,
             label: option.name,
-            // id : option.id,
         }));
     };
 
-    // onChange = (selection) => this.props.onChange(selection.map((s) => s.value));
-    onChange = (selection) => this.props.onChange(selection);
+    onChange = (selection: Selection) => this.props.onChange(selection);
 
     render() {
         return (

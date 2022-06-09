@@ -6,7 +6,7 @@ import {bindActionCreators} from 'redux';
 
 import {getMilestoneOptions} from '../../actions';
 
-import GitlabMilestoneSelector from './gitlab_milestone_selector.jsx';
+import GitlabMilestoneSelector from './gitlab_milestone_selector.tsx';
 
 const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators({getMilestoneOptions}, dispatch),

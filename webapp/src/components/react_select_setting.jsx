@@ -112,7 +112,7 @@ export default class ReactSelectSetting extends React.PureComponent {
                     styles={getStyleForReactSelect(this.props.theme)}
                 />
             );
-        }else{
+        } else {
             selectComponent = (
                 <ReactSelect
                     {...this.props}

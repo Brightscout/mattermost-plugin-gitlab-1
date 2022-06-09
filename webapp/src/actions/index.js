@@ -314,7 +314,6 @@ export function createIssue(payload) {
         if (!connected) {
             return {error: data};
         }
-        console.log(data);
         return {data};
     };
 }
