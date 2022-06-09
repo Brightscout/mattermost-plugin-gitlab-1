@@ -49,7 +49,7 @@ export interface Item {
     repository?: {
         full_name: string;
     };
-    labels_with_details?: Label[];
+    labels?: Label[];
     target: Target;
 }
 
