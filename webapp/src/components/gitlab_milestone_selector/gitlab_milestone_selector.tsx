@@ -10,14 +10,19 @@ interface PropTypes{
     projectID: number;
     projectName: string;
     theme: Theme;
-    selectedMilestone: any;
-    onChange: any;
+    selectedMilestone: Selection;
+    onChange: (milestone: Selection) => void;
     actions: any;
 };
 
 interface Milestone{
     id: number;
     title: string;
+}
+
+interface Selection{
+    value: number;
+    label: string;
 }
 
 export default class GitlabMilestoneSelector extends PureComponent<PropTypes> {

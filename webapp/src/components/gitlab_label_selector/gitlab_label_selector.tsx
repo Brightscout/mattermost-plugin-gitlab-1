@@ -10,8 +10,8 @@ interface PropTypes{
     projectID: number;
     projectName: string;
     theme: Theme;
-    selectedLabels: any;
-    onChange: any;
+    selectedLabels: Selection[];
+    onChange: (labels: Selection) => void;
     actions: any;
 };
 
