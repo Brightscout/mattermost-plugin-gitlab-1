@@ -573,7 +573,7 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 
 	if err := json.NewDecoder(r.Body).Decode(&issue); err != nil {
 		c.Log.WithError(err).Warnf("Error decoding create issue JSON body")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Please provide a JSON object.", StatusCode: http.StatusBadRequest})
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Please provide a JSON object. Error: %s", err.Error()), StatusCode: http.StatusBadRequest})
 		return
 	}
 
@@ -583,11 +583,11 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 	if issue.PostID != "" {
 		post, appErr = p.API.GetPost(issue.PostID)
 		if appErr != nil {
-			p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to load post " + issue.PostID, StatusCode: http.StatusInternalServerError})
+			p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("failed to load post %s", issue.PostID), StatusCode: http.StatusInternalServerError})
 			return
 		}
 		if post == nil {
-			p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to load post " + issue.PostID + ": not found", StatusCode: http.StatusNotFound})
+			p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("failed to load post %s : not found", issue.PostID), StatusCode: http.StatusNotFound})
 			return
 		}
 		permalink = p.getPermaLink(issue.PostID)
@@ -596,7 +596,7 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 	result, err := p.GitlabClient.CreateIssue(c.Ctx, c.GitlabInfo, issue)
 	if err != nil {
 		c.Log.WithError(err).Warnf("Can't list create issue in GitLab API")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to create issue in GitLab API.", StatusCode: http.StatusInternalServerError})
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Unable to create issue in GitLab API. Error: %s", err.Error()), StatusCode: http.StatusInternalServerError})
 		return
 	}
 
@@ -625,7 +625,7 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 	}
 	if appErr != nil {
 		c.Log.WithError(appErr).Warnf("failed to create notification post")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to create notification post, postID: " + issue.PostID + ", channelID: " + channelID, StatusCode: http.StatusInternalServerError})
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("failed to create notification post, postID: %s, channelID: %s", issue.PostID, channelID), StatusCode: http.StatusInternalServerError})
 		return
 	}
 
