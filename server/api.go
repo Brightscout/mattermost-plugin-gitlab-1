@@ -55,6 +55,7 @@ func (p *Plugin) initializeAPI() {
 	apiRouter.HandleFunc("/yourprs", p.checkAuth(p.attachUserContext(p.getYourPrs), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/prdetails", p.checkAuth(p.attachUserContext(p.getPrDetails), ResponseTypePlain)).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/createissue", p.checkAuth(p.attachUserContext(p.createIssue), ResponseTypePlain)).Methods(http.MethodPost)
+	apiRouter.HandleFunc("/attachcommenttoissue", p.checkAuth(p.attachUserContext(p.attachCommentToIssue), ResponseTypePlain)).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/yourassignments", p.checkAuth(p.attachUserContext(p.getYourAssignments), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/unreads", p.checkAuth(p.attachUserContext(p.getUnreads), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/projects", p.checkAuth(p.attachUserContext(p.getYourProjects), ResponseTypePlain)).Methods(http.MethodGet)
@@ -556,13 +557,13 @@ func (p *Plugin) getPrDetails(c *UserContext, w http.ResponseWriter, r *http.Req
 	var prList []*gitlab.PRDetails
 	if err := json.NewDecoder(r.Body).Decode(&prList); err != nil {
 		c.Log.WithError(err).Warnf("Error decoding PRDetails JSON body")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Error decoding PRDetails JSON body.Error: %d", err), StatusCode: http.StatusBadRequest})
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Error decoding PRDetails JSON body. Error: %s", err.Error()), StatusCode: http.StatusBadRequest})
 		return
 	}
 	result, err := p.GitlabClient.GetYourPrDetails(c.Ctx, c.Log, c.GitlabInfo, prList)
 	if err != nil {
 		c.Log.WithError(err).Warnf("Can't list merge-request details in GitLab API")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Can't list merge-request details in GitLab API.Error: %d", err), StatusCode: http.StatusInternalServerError})
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Can't list merge-request details in GitLab API. Error: %s", err.Error()), StatusCode: http.StatusInternalServerError})
 		return
 	}
 
@@ -574,7 +575,7 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 
 	if err := json.NewDecoder(r.Body).Decode(&issue); err != nil {
 		c.Log.WithError(err).Warnf("Error decoding create issue JSON body")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Please provide a JSON object.", StatusCode: http.StatusBadRequest})
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Please provide a JSON object. Error: %s", err.Error()), StatusCode: http.StatusBadRequest})
 		return
 	}
 
@@ -597,7 +598,7 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 	result, err := p.GitlabClient.CreateIssue(c.Ctx, c.GitlabInfo, issue)
 	if err != nil {
 		c.Log.WithError(err).Warnf("Can't list create issue in GitLab API")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to create issue in GitLab API.", StatusCode: http.StatusInternalServerError})
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Unable to create issue in GitLab API. Error: %s", err.Error()), StatusCode: http.StatusInternalServerError})
 		return
 	}
 
@@ -627,6 +628,25 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 	if appErr != nil {
 		c.Log.WithError(appErr).Warnf("failed to create notification post")
 		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to create notification post, postID: " + issue.PostID + ", channelID: " + channelID, StatusCode: http.StatusInternalServerError})
+		return
+	}
+
+	p.writeAPIResponse(w, result)
+}
+
+func (p *Plugin) attachCommentToIssue(c *UserContext, w http.ResponseWriter, r *http.Request) {
+	var issue *gitlab.IssueRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&issue); err != nil {
+		c.Log.WithError(err).Warnf("Error decoding attach comment to issue JSON body")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Error decoding attach comment to issue JSON body. Error: %s", err.Error()), StatusCode: http.StatusBadRequest})
+		return
+	}
+
+	result, err := p.GitlabClient.AttachCommentToIssue(c.Ctx, c.GitlabInfo, issue)
+	if err != nil {
+		c.Log.WithError(err).Warnf("Can't add comment to issue in GitLab API")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Cant't add comment to issue in GitLab API. Error: %s", err.Error()), StatusCode: http.StatusInternalServerError})
 		return
 	}
 

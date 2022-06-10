@@ -42,6 +42,10 @@ export default class Client {
         return this.doPost(`${this.url}/createissue`, payload);
     }
 
+    attachCommentToIssue = async (payload) => {
+        return this.doPost(`${this.url}/attachcommenttoissue`, payload);
+    }
+
     searchIssues = async (searchTerm) => {
         return this.doGet(`${this.url}/searchissues?search=${searchTerm}`);
     }

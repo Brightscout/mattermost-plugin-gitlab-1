@@ -599,6 +599,7 @@ func (g *gitlab) GetUnreads(ctx context.Context, user *UserInfo) ([]*internGitla
 
 type IssueRequest struct {
 	ID          int                 `json:"id"`
+	IID         int                 `json:"iid"`
 	Title       string              `json:"title"`
 	Description string              `json:"description"`
 	Milestone   int                 `json:"milestone"`
@@ -607,6 +608,7 @@ type IssueRequest struct {
 	Labels      internGitlab.Labels `json:"labels"`
 	PostID      string              `json:"post_id"`
 	ChannelID   string              `json:"channel_id"`
+	Comment     string              `json:"comment"`
 }
 
 func (g *gitlab) CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRequest) (*internGitlab.Issue, error) {
@@ -614,16 +616,38 @@ func (g *gitlab) CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRe
 	if err != nil {
 		return nil, err
 	}
-	var pid interface{} = issue.ProjectID
 
 	result, resp, err := client.Issues.CreateIssue(
-		pid,
+		issue.ProjectID,
 		&internGitlab.CreateIssueOptions{
 			Title:       &issue.Title,
 			Description: &issue.Description,
 			MilestoneID: &issue.Milestone,
 			AssigneeIDs: &issue.Assignees,
 			Labels:      &issue.Labels,
+		},
+		internGitlab.WithContext(ctx),
+	)
+	if respErr := checkResponse(resp); respErr != nil {
+		return nil, respErr
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "can't create issue in GitLab api")
+	}
+	return result, nil
+}
+
+func (g *gitlab) AttachCommentToIssue(ctx context.Context, user *UserInfo, issue *IssueRequest) (*internGitlab.Note, error) {
+	client, err := g.gitlabConnect(*user.Token)
+	if err != nil {
+		return nil, err
+	}
+
+	result, resp, err := client.Notes.CreateIssueNote(
+		issue.ProjectID,
+		issue.IID,
+		&internGitlab.CreateIssueNoteOptions{
+			Body: &issue.Comment,
 		},
 		internGitlab.WithContext(ctx),
 	)
