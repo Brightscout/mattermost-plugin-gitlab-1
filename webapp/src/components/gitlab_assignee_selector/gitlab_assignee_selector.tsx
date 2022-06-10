@@ -5,6 +5,7 @@ import React, {PureComponent} from 'react';
 import {Theme} from 'mattermost-redux/types/preferences';
 
 import IssueAttributeSelector from '../issue_attribute_selector';
+import {Assignee, Selection} from '../../types/gitlab_assignee_selector'
 
 interface PropTypes{
     projectID: number;
@@ -14,16 +15,6 @@ interface PropTypes{
     onChange: (assignees: Selection) => void;
     actions: any;
 };
-
-interface Assignee{
-    id: number;
-    username: string;
-}
-
-interface Selection{
-    value: number;
-    label: string;
-}
 
 export default class GitlabAssigneeSelector extends PureComponent<PropTypes> {
 

@@ -5,6 +5,7 @@ import React, {PureComponent} from 'react';
 import {Theme} from 'mattermost-redux/types/preferences';
 
 import IssueAttributeSelector from '../issue_attribute_selector';
+import {Milestone, Selection} from '../../types/gitlab_milestone_selector'
 
 interface PropTypes{
     projectID: number;
@@ -14,16 +15,6 @@ interface PropTypes{
     onChange: (milestone: Selection) => void;
     actions: any;
 };
-
-interface Milestone{
-    id: number;
-    title: string;
-}
-
-interface Selection{
-    value: number;
-    label: string;
-}
 
 export default class GitlabMilestoneSelector extends PureComponent<PropTypes> {
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strings"
+
 	"github.com/mattermost/mattermost-plugin-api/experimental/bot/logger"
 
 	"github.com/pkg/errors"
@@ -26,11 +27,11 @@ type Gitlab interface {
 	GetUserDetails(ctx context.Context, user *UserInfo) (*internGitlab.User, error)
 	GetProject(ctx context.Context, user *UserInfo, owner, repo string) (*internGitlab.Project, error)
 	CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRequest) (*internGitlab.Issue, error)
-	GetYourPrDetails(ctx context.Context,log logger.Logger, user *UserInfo, prList []*PRDetails) ([]*PRDetails, error)
-	GetReviews(ctx context.Context, user *UserInfo) ([]*GitlabMergeRequest, error)
-	GetYourPrs(ctx context.Context, user *UserInfo) ([]*GitlabMergeRequest, error)
-	GetYourAssignments(ctx context.Context, user *UserInfo) ([]*internGitlab.Issue, error)
 	GetYourProjects(ctx context.Context, user *UserInfo) ([]*internGitlab.Project, error)
+	GetYourPrDetails(ctx context.Context, log logger.Logger, user *UserInfo, prList []*PRDetails) ([]*PRDetails, error)
+	GetReviews(ctx context.Context, user *UserInfo) ([]*MergeRequest, error)
+	GetYourPrs(ctx context.Context, user *UserInfo) ([]*MergeRequest, error)
+	GetYourAssignments(ctx context.Context, user *UserInfo) ([]*Issue, error)
 	GetUnreads(ctx context.Context, user *UserInfo) ([]*internGitlab.Todo, error)
 	GetLabels(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.Label, error)
 	GetAssignees(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.ProjectMember, error)

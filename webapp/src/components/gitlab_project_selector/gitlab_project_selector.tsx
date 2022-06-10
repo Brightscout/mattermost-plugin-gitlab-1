@@ -5,11 +5,7 @@ import React, {PureComponent} from 'react';
 import {Theme} from 'mattermost-redux/types/preferences';
 
 import ReactSelectSetting from '../react_select_setting';
-
-interface Project{
-    path_with_namespace: string;
-    id: number;
-}
+import {Project, Selection} from '../../types/gitlab_project_selector'
 
 interface PropTypes{
     yourProjects: Project[];
@@ -20,11 +16,6 @@ interface PropTypes{
     addValidate: (key: string, validateField: () => boolean) => void;
     removeValidate: (key: string) => void;
 };
-
-interface Selection {
-    name: string;
-    project_id: number | undefined;
-}
 
 interface StateTypes{
     invalid: boolean;

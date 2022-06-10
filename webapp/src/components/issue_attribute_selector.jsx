@@ -113,7 +113,6 @@ export default class IssueAttributeSelector extends PureComponent {
     };
 
     render() {
-
         const noOptionsMessage = this.props.projectName ? 'No options' : 'Please select a project first';
 
         return (

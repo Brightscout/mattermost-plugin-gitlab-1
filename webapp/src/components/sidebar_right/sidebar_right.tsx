@@ -80,118 +80,119 @@ function shouldUpdateDetails(prs: Item[], prevPrs: Item[], targetState: string, 
 
 export default class SidebarRight extends React.PureComponent<PropTypes> {
 
-    componentDidMount() {
-        if (this.props.yourPrs && this.props.rhsState === RHSStates.PRS) {
-            this.props.actions.getYourPrsDetails(
-                mapGitlabItemListToPrList(this.props.yourPrs),
-            );
-        }
-        if (this.props.reviews && this.props.rhsState === RHSStates.REVIEWS) {
-            this.props.actions.getReviewsDetails(
-                mapGitlabItemListToPrList(this.props.reviews),
-            );
-        }
-    }
+  componentDidMount() {
+      if (this.props.yourPrs && this.props.rhsState === RHSStates.PRS) {
+          this.props.actions.getYourPrDetails(
+              mapGitlabItemListToPrList(this.props.yourPrs),
+          );
+      }
+      if (this.props.reviews && this.props.rhsState === RHSStates.REVIEWS) {
+          this.props.actions.getReviewDetails(
+              mapGitlabItemListToPrList(this.props.reviews),
+          );
+      }
+  }
 
-    componentDidUpdate(prevProps:PropTypes) {
-        if (
-            shouldUpdateDetails(
-                this.props.yourPrs,
-                prevProps.yourPrs,
-                RHSStates.PRS,
-                this.props.rhsState,
-                prevProps.rhsState,
-            )
-        ) {
-            this.props.actions.getYourPrsDetails(
-                mapGitlabItemListToPrList(this.props.yourPrs),
-            );
-        }
+  componentDidUpdate(prevProps: PropTypes) {
+      if (
+          shouldUpdateDetails(
+              this.props.yourPrs,
+              prevProps.yourPrs,
+              RHSStates.PRS,
+              this.props.rhsState,
+              prevProps.rhsState,
+          )
+      ) {
+          this.props.actions.getYourPrDetails(
+              mapGitlabItemListToPrList(this.props.yourPrs),
+          );
+      }
 
-        if (
-            shouldUpdateDetails(
-                this.props.reviews,
-                prevProps.reviews,
-                RHSStates.REVIEWS,
-                this.props.rhsState,
-                prevProps.rhsState,
-            )
-        ) {
-            this.props.actions.getReviewsDetails(
-                mapGitlabItemListToPrList(this.props.reviews),
-            );
-        }
-    }
+      if (
+          shouldUpdateDetails(
+              this.props.reviews,
+              prevProps.reviews,
+              RHSStates.REVIEWS,
+              this.props.rhsState,
+              prevProps.rhsState,
+          )
+      ) {
+          this.props.actions.getReviewDetails(
+              mapGitlabItemListToPrList(this.props.reviews),
+          );
+      }
+  }
 
-    render() {
-        const style = getStyle(this.props.theme)
-        const baseURL = this.props.gitlabURL ?? 'https://gitlab.com';
-        const orgQuery = this.props.org ? `+org%3A ${this.props.org}` : '';
+  render() {
+      const style = getStyle(this.props.theme)
+      const baseURL:string = this.props.gitlabURL ?? 'https://gitlab.com';
+      const orgQuery:string = this.props.org ? `+org%3A ${this.props.org}` : '';
+    
+      let title:string = '';
+      let gitlabItems: Item[] = [];
+      let listUrl:string = '';
 
-        let title: string = '';
-        let gitlabItems: Item[] = [];
-        let listUrl: string = '';
+      switch (this.props.rhsState) {
+      case RHSStates.PRS:
+          gitlabItems = this.props.yourPrs;
+          title = 'Your Open Merge Requests';
+          listUrl = `${baseURL}/dashboard/merge_requests?state=opened&scope=all&author_username=${this.props.username}&archived=false${orgQuery}`;
+          break;
+      case RHSStates.REVIEWS:
+          gitlabItems = this.props.reviews;
+          listUrl = `${baseURL}/dashboard/merge_requests?state=opened&scope=all&assignee_username=${this.props.username}&archived=false${orgQuery}`;
+          title = 'Merge Requests Needing Review';
+          break;
+      case RHSStates.UNREADS:
+          gitlabItems = this.props.unreads;
+          title = 'Unread Messages';
+          listUrl = `${baseURL}/dashboard/todos`;
+          break;
+      case RHSStates.ASSIGNMENTS:
+          gitlabItems = this.props.yourAssignments;
+          title = 'Your Assignments';
+          listUrl = `${baseURL}/dashboard/issues?state=opened&scope=all&assignee_username=${this.props.username}${orgQuery}`;
+          break;
+      default:
+          break;
+      }
 
-        switch (this.props.rhsState) {
-            case RHSStates.PRS:
-                gitlabItems = this.props.yourPrs;
-                title = 'Your Open Merge Requests';
-                listUrl = `${baseURL}/dashboard/merge_requests?state=opened&scope=all&author_username=${this.props.username}&archived=false${orgQuery}`;
-                break;
-            case RHSStates.REVIEWS:
-                gitlabItems = this.props.reviews;
-                listUrl = `${baseURL}/dashboard/merge_requests?state=opened&scope=all&assignee_username=${this.props.username}&archived=false${orgQuery}`;
-                title = 'Merge Requests Needing Review';
-                break;
-            case RHSStates.UNREADS:
-                gitlabItems = this.props.unreads;
-                title = 'Unread Messages';
-                listUrl = `${baseURL}/dashboard/todos`;
-                break;
-            case RHSStates.ASSIGNMENTS:
-                gitlabItems = this.props.yourAssignments;
-                title = 'Your Assignments';
-                listUrl = `${baseURL}/dashboard/issues?state=opened&scope=all&assignee_username=${this.props.username}${orgQuery}`;
-                break;
-            default:
-                break;
-        }
-
-        return (
-            <React.Fragment>
-                <Scrollbars
-                    autoHide={true}
-                    autoHideTimeout={500}
-                    autoHideDuration={500}
-                    renderThumbHorizontal={renderThumbHorizontal}
-                    renderThumbVertical={renderThumbVertical}
-                    renderView={renderView}
-                >
-                    <div style={style.sectionHeader}>
-                        <strong>
-                            <a
-                                href={listUrl}
-                                target='_blank'
-                                rel='noopener noreferrer'
-                            >
-                                {title}
-                            </a>
-                        </strong>
-                    </div>
-                    <div>
-                        {!gitlabItems.length ? (<div style={style.container}>{'You have no active items'}</div>)
-                            : gitlabItems.map((item) =>
-                                <GitlabItems
-                                    item={item}
-                                    theme={this.props.theme}
-                                />
-                            )}
-
-                    </div>
-                </Scrollbars>
-            </React.Fragment>
-        );
-    }
+      return (
+          <React.Fragment>
+              <Scrollbars
+                  autoHide={true}
+                  autoHideTimeout={500}     // Hide delay in ms
+                  autoHideDuration={500}     // Duration for hide animation in ms.
+                  renderThumbHorizontal={renderThumbHorizontal}
+                  renderThumbVertical={renderThumbVertical}
+                  renderView={renderView}
+              >
+                  <div style={style.sectionHeader}>
+                      <strong>
+                          <a
+                              href={listUrl}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                          >
+                              {title}
+                          </a>
+                      </strong>
+                  </div>
+                  <div>
+                      {!gitlabItems.length ? (<div style={style.container}>{'You have no active items'}</div>)
+                      : gitlabItems.map((item)=>
+                        <GitlabItems
+                            key={item.id}
+                            item={item}
+                            theme={this.props.theme}
+                      />
+                      )}
+                      
+                  </div>
+              </Scrollbars>
+          </React.Fragment>
+      );
+  }
 }
 
 const getStyle = makeStyleFromTheme((theme) => {
