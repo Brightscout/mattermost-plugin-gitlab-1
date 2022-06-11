@@ -5,21 +5,16 @@ import React, {PureComponent} from 'react';
 import {Theme} from 'mattermost-redux/types/preferences';
 
 import ReactSelectSetting from '../react_select_setting';
-
-interface Project{
-    path_with_namespace: string;
-    permissions: any;
-    id: number;
-}
+import {Project, Selection} from '../../types/gitlab_project_selector'
 
 interface PropTypes{
     yourProjects: Project[];
     theme: Theme;
-    onChange: any;
+    onChange: (project: Selection) => void;
     actions: any;
     value: string;
-    addValidate: any;
-    removeValidate: any;
+    addValidate: (key: string, validateField: () => boolean) => void;
+    removeValidate: (key: string) => void;
 };
 
 interface StateTypes{
@@ -53,7 +48,7 @@ export default class GitlabProjectSelector extends PureComponent<PropTypes, Stat
 
     onChange = (_: string, name: string) => {
         const project = this.props.yourProjects.find((p: Project) => p.path_with_namespace === name);
-        this.props.onChange({name, permissions: project?.permissions,project_id: project?.id});
+        this.props.onChange({name, project_id: project?.id});
     }
 
     render() {

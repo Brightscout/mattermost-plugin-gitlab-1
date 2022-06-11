@@ -585,11 +585,11 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 	if issue.PostID != "" {
 		post, appErr = p.API.GetPost(issue.PostID)
 		if appErr != nil {
-			p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to load post " + issue.PostID, StatusCode: http.StatusInternalServerError})
+			p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("failed to load post %s", issue.PostID), StatusCode: http.StatusInternalServerError})
 			return
 		}
 		if post == nil {
-			p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to load post " + issue.PostID + ": not found", StatusCode: http.StatusNotFound})
+			p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("failed to load post %s : not found", issue.PostID), StatusCode: http.StatusNotFound})
 			return
 		}
 		permalink = p.getPermaLink(issue.PostID)
@@ -627,7 +627,7 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 	}
 	if appErr != nil {
 		c.Log.WithError(appErr).Warnf("failed to create notification post")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to create notification post, postID: " + issue.PostID + ", channelID: " + channelID, StatusCode: http.StatusInternalServerError})
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("failed to create notification post, postID: %s, channelID: %s", issue.PostID, channelID), StatusCode: http.StatusInternalServerError})
 		return
 	}
 
@@ -643,10 +643,63 @@ func (p *Plugin) attachCommentToIssue(c *UserContext, w http.ResponseWriter, r *
 		return
 	}
 
-	result, err := p.GitlabClient.AttachCommentToIssue(c.Ctx, c.GitlabInfo, issue)
+	if issue.PostID == "" {
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Please provide a valid post id", StatusCode: http.StatusBadRequest})
+		return
+	}
+
+	if issue.IID == 0 {
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Please provide a valid issue iid.", StatusCode: http.StatusBadRequest})
+		return
+	}
+
+	if issue.Comment == "" {
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Please provide a valid non empty comment.", StatusCode: http.StatusBadRequest})
+		return
+	}
+
+	post, appErr := p.API.GetPost(issue.PostID)
+	if appErr != nil {
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to load post " + issue.PostID, StatusCode: http.StatusInternalServerError})
+		return
+	}
+	if post == nil {
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to load post " + issue.PostID + ": not found", StatusCode: http.StatusNotFound})
+		return
+	}
+
+	commentUsername, apiErr := p.getUsername(post.UserId)
+	if apiErr != nil {
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to get username", StatusCode: http.StatusInternalServerError})
+		return
+	}
+
+	permalink := p.getPermaLink(issue.PostID)
+
+	result, err := p.GitlabClient.AttachCommentToIssue(c.Ctx, c.GitlabInfo, issue, permalink, commentUsername)
 	if err != nil {
 		c.Log.WithError(err).Warnf("Can't add comment to issue in GitLab API")
 		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Cant't add comment to issue in GitLab API. Error: %s", err.Error()), StatusCode: http.StatusInternalServerError})
+		return
+	}
+
+	rootID := issue.PostID
+	if post.RootId != "" {
+		// the original post was a reply
+		rootID = post.RootId
+	}
+
+	permalinkReplyMessage := fmt.Sprintf("[Message](%v) attached to GitLab issue [#%v](%v)", permalink, issue.IID, issue.WebURL)
+	reply := &model.Post{
+		Message:   permalinkReplyMessage,
+		ChannelId: post.ChannelId,
+		RootId:    rootID,
+		UserId:    c.UserID,
+	}
+
+	_, appErr = p.API.CreatePost(reply)
+	if appErr != nil {
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "failed to create notification post " + issue.PostID, StatusCode: http.StatusInternalServerError})
 		return
 	}
 

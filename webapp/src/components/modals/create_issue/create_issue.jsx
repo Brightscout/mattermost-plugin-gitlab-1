@@ -26,34 +26,6 @@ const initialState = {
     issueTitleValid: true,
 };
 
-// interface StateTypes{
-//     submitting: boolean;
-//     error: string|null;
-//     project: any;
-//     issueTitle: string;
-//     issueDescription: string;
-//     labels: any;
-//     assignees: any;
-//     milestone: any;
-//     showErrors: boolean;
-//     issueTitleValid: boolean;
-// }
-
-// interface PropTypes{
-//     channelId: string;
-//     title: string;
-//     post: any;
-//     theme: Theme;
-//     visible: boolean;
-//     actions: any;
-// };
-
-// interface ValidatorTypes{
-//     validate: any;
-//     addComponent: any;
-//     removeComponent: any;
-// }
-
 export default class CreateIssueModal extends PureComponent {
     static propTypes = {
         close: PropTypes.func.isRequired,
@@ -294,10 +266,5 @@ const getStyle = (theme) => ({
         padding: '2em 2em 3em',
         color: theme.centerChannelColor,
         backgroundColor: theme.centerChannelBg,
-    },
-    descriptionArea: {
-        height: 'auto',
-        width: '100%',
-        color: '#000',
     },
 });

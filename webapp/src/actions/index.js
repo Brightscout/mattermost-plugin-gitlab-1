@@ -64,7 +64,7 @@ export function getReviews() {
     };
 }
 
-export function getReviewsDetails(prList) {
+export function getReviewDetails(prList) {
     return async (dispatch, getState) => {
         let data;
         try {
@@ -113,7 +113,7 @@ export function getYourPrs() {
     };
 }
 
-export function getYourPrsDetails(prList) {
+export function getYourPrDetails(prList) {
     return async (dispatch, getState) => {
         let data;
         try {
@@ -330,6 +330,23 @@ export function openAttachCommentToIssueModal(postId) {
 export function closeAttachCommentToIssueModal() {
     return {
         type: ActionTypes.CLOSE_ATTACH_COMMENT_TO_ISSUE_MODAL,
+    };
+}
+
+export function attachCommentToIssue(payload) {
+    return async (dispatch) => {
+        let data;
+        try {
+            data = await Client.attachCommentToIssue(payload);
+        } catch (error) {
+            return {error};
+        }
+
+        const connected = await dispatch(checkAndHandleNotConnected(data));
+        if (!connected) {
+            return {error: data};
+        }
+        return {data};
     };
 }
 

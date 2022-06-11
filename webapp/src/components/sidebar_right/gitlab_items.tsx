@@ -50,25 +50,25 @@ function GitlabItems({item, theme}: GitlabItemsProps) {
 
     let title: JSX.Element | null = <>{titleText}</>;
     if (item.web_url || item.target_url) {
-        title = (
-            <a
-                href={item.web_url ?? item.target_url}
-                target='_blank'
-                rel='noopener noreferrer'
-                style={style.itemTitle}
-            >
-                {titleText}
+      title = (
+        <a
+          href={item.web_url ?? item.target_url}
+          target='_blank'
+          rel='noopener noreferrer'
+          style={style.itemTitle}
+        >
+          {titleText}
+        </a>
+      );
+      if (item.iid) {
+        number = (
+          <strong>
+            <a href={item.web_url} target='_blank' rel='noopener noreferrer'>
+              {number}
             </a>
+          </strong>
         );
-        if (item.iid) {
-            number = (
-                <strong>
-                    <a href={item.web_url} target='_blank' rel='noopener noreferrer'>
-                        {number}
-                    </a>
-                </strong>
-            );
-        }
+      }
     }
 
     const milestone: JSX.Element | null = item.milestone ? (
@@ -141,43 +141,46 @@ function GitlabItems({item, theme}: GitlabItemsProps) {
                 );
         }
     }
-        
-    const reviews = (
-      <div style={style.subtitle}>
-          <span className="light">
-              {`${item.approvers} out of ${item.total_reviewers} ${(item.total_reviewers>1 ? "reviews" : "review")} complete.`}
-          </span>
-      </div>
-    )
+
+    let reviews: JSX.Element | null = null;
+    if(item.total_reviewers && item.approvers){
+        reviews = (
+          <div style={style.subtitle}>
+              <span className="light">
+                  {`${item.approvers} out of ${item.total_reviewers} ${(item.total_reviewers>1 ? "reviews" : "review")} complete.`}
+              </span>
+          </div>
+        )
+    }
 
     return (
-        <div key={item.id} style={style.container}>
-            <div>
-                <strong>
-                    {title}
-                    {status}
-                    {hasConflict}
-                </strong>
-            </div>
-            <div>
-                {number}
-                <span className='light'>{`(${repoName})`}</span>
-            </div>
-            {labels}
-            <div className='light' style={style.subtitle}>
-                {item.created_at && `Opened ${formatTimeSince(item.created_at)} ago ${userName && ` by ${userName}.`}`}
-                {milestone}
-            </div>
-            <div className="light" style={style.subtitle}>
-                {item.action_name ? (
-                    <>
-                        <div>{item.updated_at && `${formatTimeSince(item.updated_at)} ago`}</div>
-                        {notificationReasons[item.action_name]}
-                    </>
-                ) : null}
-            </div>
-            {item.total_reviewers?reviews:null}
+      <div key={item.id} style={style.container}>
+        <div>
+          <strong>
+              {title}
+              {status}
+              {hasConflict}
+          </strong>
         </div>
+        <div>
+          {number}
+          <span className='light'>{`(${repoName})`}</span>
+        </div>
+        {labels}
+        <div className='light' style={style.subtitle}>
+          {item.created_at && `Opened ${formatTimeSince(item.created_at)} ago ${userName && ` by ${userName}.`}`}
+          {milestone}
+        </div>
+        <div className="light" style={style.subtitle}>
+        {item.action_name ? (
+            <>
+              <div>{item.updated_at && `${formatTimeSince(item.updated_at)} ago`}</div>
+              {notificationReasons[item.action_name]}
+            </>
+          ) : null}
+        </div>
+        {item.total_reviewers>0 && reviews}
+      </div>
     );
 }
 

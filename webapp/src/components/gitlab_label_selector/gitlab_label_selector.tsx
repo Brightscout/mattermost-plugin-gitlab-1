@@ -5,24 +5,16 @@ import React, {PureComponent} from 'react';
 import {Theme} from 'mattermost-redux/types/preferences';
 
 import IssueAttributeSelector from '../issue_attribute_selector';
+import {Label, Selection} from '../../types/gitlab_label_selector'
 
 interface PropTypes{
     projectID: number;
     projectName: string;
     theme: Theme;
-    selectedLabels: any;
-    onChange: any;
+    selectedLabels: Selection[];
+    onChange: (labels: Selection) => void;
     actions: any;
 };
-
-interface Label{
-    name: string;
-}
-
-interface Selection{
-    value: string;
-    label: string;
-}
 
 export default class GitlabLabelSelector extends PureComponent<PropTypes> {
    
