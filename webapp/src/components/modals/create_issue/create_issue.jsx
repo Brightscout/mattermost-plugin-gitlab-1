@@ -28,8 +28,6 @@ const initialState = {
 
 export default class CreateIssueModal extends PureComponent {
     static propTypes = {
-        close: PropTypes.func.isRequired,
-        create: PropTypes.func.isRequired,
         post: PropTypes.object,
         title: PropTypes.string,
         channelId: PropTypes.string,
