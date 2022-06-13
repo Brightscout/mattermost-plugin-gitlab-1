@@ -572,8 +572,8 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 	var issue *gitlab.IssueRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&issue); err != nil {
-		c.Log.WithError(err).Warnf("Error decoding create issue JSON body")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Please provide a JSON object. Error: %s", err.Error()), StatusCode: http.StatusBadRequest})
+		c.Log.WithError(err).Warnf("Error decoding the JSON body to create issue")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Please provide a valid JSON object. Error: %s", err.Error()), StatusCode: http.StatusBadRequest})
 		return
 	}
 
@@ -595,7 +595,7 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 
 	result, err := p.GitlabClient.CreateIssue(c.Ctx, c.GitlabInfo, issue)
 	if err != nil {
-		c.Log.WithError(err).Warnf("Can't list create issue in GitLab API")
+		c.Log.WithError(err).Warnf("Can't create issue in GitLab API")
 		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Unable to create issue in GitLab API. Error: %s", err.Error()), StatusCode: http.StatusInternalServerError})
 		return
 	}
@@ -652,7 +652,7 @@ func (p *Plugin) getYourAssignments(c *UserContext, w http.ResponseWriter, r *ht
 func (p *Plugin) getYourProjects(c *UserContext, w http.ResponseWriter, r *http.Request) {
 	result, err := p.GitlabClient.GetYourProjects(c.Ctx, c.GitlabInfo)
 	if err != nil {
-		c.Log.WithError(err).Warnf("Can't list repos where author in GitLab API")
+		c.Log.WithError(err).Warnf("Can't list repos in GitLab API")
 		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to list repos in GitLab API.", StatusCode: http.StatusInternalServerError})
 		return
 	}
@@ -688,8 +688,8 @@ func (p *Plugin) getAssignees(c *UserContext, w http.ResponseWriter, r *http.Req
 	pid := r.URL.Query().Get("pid")
 	result, err := p.GitlabClient.GetAssignees(c.Ctx, c.GitlabInfo, pid)
 	if err != nil {
-		c.Log.WithError(err).Warnf("Can't list assignee of project in GitLab API")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to list assignee in GitLab API.", StatusCode: http.StatusInternalServerError})
+		c.Log.WithError(err).Warnf("Can't list assignees of the project in GitLab API")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to list assignees in GitLab API.", StatusCode: http.StatusInternalServerError})
 		return
 	}
 

@@ -28,9 +28,7 @@ export default class FormButton extends PureComponent {
     render() {
         const {saving, disabled, savingMessage, defaultMessage, btnClass, extraClasses, ...props} = this.props;
 
-        let contents;
-        if (saving) {
-            contents = (
+        let contents = saving ? (
                 <span>
                     <span
                         className='fa fa-spin fa-spinner'
@@ -38,10 +36,7 @@ export default class FormButton extends PureComponent {
                     />
                     {savingMessage}
                 </span>
-            );
-        } else {
-            contents = defaultMessage;
-        }
+            ): defaultMessage
 
         let className = 'save-button btn ' + btnClass;
 
