@@ -27,6 +27,21 @@ type PRDetails struct {
 	ProjectID int                           `json:"project_id"`
 }
 
+type IssueRequest struct {
+	ID          int                 `json:"id"`
+	IID         int                 `json:"iid"`
+	Title       string              `json:"title"`
+	Description string              `json:"description"`
+	Milestone   int                 `json:"milestone"`
+	ProjectID   int                 `json:"project_id"`
+	Assignees   []int               `json:"assignees"`
+	Labels      internGitlab.Labels `json:"labels"`
+	PostID      string              `json:"post_id"`
+	ChannelID   string              `json:"channel_id"`
+	Comment     string              `json:"comment"`
+	WebURL      string              `json:"web_url"`
+}
+
 type MergeRequest struct {
 	*internGitlab.MergeRequest
 	LabelsWithDetails []*internGitlab.Label `json:"labels_with_details,omitempty"`
@@ -619,21 +634,6 @@ func (g *gitlab) GetUnreads(ctx context.Context, user *UserInfo) ([]*internGitla
 	return notifications, nil
 }
 
-type IssueRequest struct {
-	ID          int                 `json:"id"`
-	IID         int                 `json:"iid"`
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	Milestone   int                 `json:"milestone"`
-	ProjectID   int                 `json:"project_id"`
-	Assignees   []int               `json:"assignees"`
-	Labels      internGitlab.Labels `json:"labels"`
-	PostID      string              `json:"post_id"`
-	ChannelID   string              `json:"channel_id"`
-	Comment     string              `json:"comment"`
-	WebURL      string              `json:"web_url"`
-}
-
 func (g *gitlab) CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRequest) (*internGitlab.Issue, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
@@ -684,7 +684,7 @@ func (g *gitlab) AttachCommentToIssue(ctx context.Context, user *UserInfo, issue
 		return nil, respErr
 	}
 	if err != nil {
-		return nil, errors.Wrap(err, "can't create issue in GitLab api")
+		return nil, errors.Wrap(err, "can't create issue comment in GitLab api")
 	}
 	return result, nil
 }
