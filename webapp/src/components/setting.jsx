@@ -45,9 +45,9 @@ export default class Setting extends React.PureComponent {
                 }
                 <div>
                     {children}
-                    <div className='help-text'>
+                    <p className='help-text'>
                         {helpText}
-                    </div>
+                    </p>
                 </div>
             </div>
         );

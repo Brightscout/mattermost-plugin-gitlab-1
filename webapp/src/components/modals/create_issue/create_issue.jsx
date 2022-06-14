@@ -28,8 +28,6 @@ const initialState = {
 
 export default class CreateIssueModal extends PureComponent {
     static propTypes = {
-        close: PropTypes.func.isRequired,
-        create: PropTypes.func.isRequired,
         post: PropTypes.object,
         title: PropTypes.string,
         channelId: PropTypes.string,
@@ -194,7 +192,7 @@ export default class CreateIssueModal extends PureComponent {
 
                 <Input
                     id={'title'}
-                    label='Title for the GitLab Issue'
+                    label='Issue title'
                     type='input'
                     required={true}
                     disabled={false}
@@ -207,7 +205,7 @@ export default class CreateIssueModal extends PureComponent {
                 {this.renderIssueAttributeSelectors()}
 
                 <Input
-                    label='Description for the GitLab Issue'
+                    label='Issue description'
                     type='textarea'
                     value={this.state.issueDescription}
                     onChange={this.handleIssueDescriptionChange}

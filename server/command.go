@@ -92,7 +92,7 @@ func (p *Plugin) getCommand(config *configuration) (*model.Command, error) {
 	return &model.Command{
 		Trigger:              "gitlab",
 		AutoComplete:         true,
-		AutoCompleteDesc:     "Available commands: connect, disconnect, todo, me, settings, subscriptions, webhook and help",
+		AutoCompleteDesc:     "Available commands: connect, disconnect, todo, me, settings, subscriptions, webhook, and help",
 		AutoCompleteHint:     "[command]",
 		AutocompleteData:     getAutocompleteData(config),
 		AutocompleteIconData: iconData,
