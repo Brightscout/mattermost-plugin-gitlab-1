@@ -55,6 +55,8 @@ export default class GitlabIssueSelector extends PureComponent {
         return this.debouncedSearchIssues(inputValue);
     };
 
+    debouncedSearchIssues = debounce(this.searchIssues, searchDebounceDelay);
+
     searchIssues = async (text) => {
         const textEncoded = encodeURIComponent(text.trim().replace(/"/g, '\\"'));
         try {
@@ -77,8 +79,6 @@ export default class GitlabIssueSelector extends PureComponent {
             return [];
         }
     };
-
-    debouncedSearchIssues = debounce(this.searchIssues, searchDebounceDelay);
 
     onChange = (e) => {
         const value = e?.value ?? '';
