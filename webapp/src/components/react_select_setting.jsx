@@ -51,8 +51,9 @@ export default class ReactSelectSetting extends React.PureComponent {
     }
 
     componentDidUpdate() {
-        if(this.state.invalid)
+        if (this.state.invalid) {
             this.isValid();
+        }
     }
 
     handleChange = (value) => {

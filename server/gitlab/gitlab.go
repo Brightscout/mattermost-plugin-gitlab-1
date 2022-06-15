@@ -27,7 +27,7 @@ type Gitlab interface {
 	GetUserDetails(ctx context.Context, user *UserInfo) (*internGitlab.User, error)
 	GetProject(ctx context.Context, user *UserInfo, owner, repo string) (*internGitlab.Project, error)
 	CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRequest) (*internGitlab.Issue, error)
-	AttachCommentToIssue(ctx context.Context, user *UserInfo, issue *IssueRequest, permalink string, commentUsername string) (*internGitlab.Note, error)
+	AttachCommentToIssue(ctx context.Context, user *UserInfo, issue *IssueRequest, permalink, commentUsername string) (*internGitlab.Note, error)
 	SearchIssues(ctx context.Context, user *UserInfo, search string) ([]*internGitlab.Issue, error)
 	GetYourProjects(ctx context.Context, user *UserInfo) ([]*internGitlab.Project, error)
 	GetYourPrDetails(ctx context.Context, log logger.Logger, user *UserInfo, prList []*PRDetails) ([]*PRDetails, error)

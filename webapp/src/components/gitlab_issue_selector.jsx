@@ -45,9 +45,9 @@ export default class GitlabIssueSelector extends PureComponent {
         }
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (prevState.invalid && this.props.value !== prevProps.value) {
-            this.setState({invalid: false}); //eslint-disable-line react/no-did-update-set-state
+    componentDidUpdate() {
+        if (this.state.invalid) {
+            this.isValid();
         }
     }
 
