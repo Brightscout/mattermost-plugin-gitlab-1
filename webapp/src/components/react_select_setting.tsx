@@ -1,40 +1,39 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, {PureComponent} from 'react';
+import {Theme} from 'mattermost-redux/types/preferences';
 
-import ReactSelect from 'react-select';
+import ReactSelect, {SingleValue} from 'react-select';
 import AsyncSelect from 'react-select/async';
 
-import Setting from 'components/setting';
-import {getStyleForReactSelect} from 'utils/styles';
+import Setting from './setting';
+import {getStyleForReactSelect} from '../utils/styles';
+import {LabelSelection as ProjectSelection} from 'src/types/gitlab_label_selector';
 
 const MAX_NUM_OPTIONS = 100;
 
-export default class ReactSelectSetting extends React.PureComponent {
-    static propTypes = {
-        name: PropTypes.string,
-        onChange: PropTypes.func,
-        theme: PropTypes.object.isRequired,
-        isClearable: PropTypes.bool,
-        options: PropTypes.array.isRequired,
-        isLoading: PropTypes.bool,
-        value: PropTypes.oneOfType([
-            PropTypes.object,
-            PropTypes.array,
-            PropTypes.string,
-        ]),
-        addValidate: PropTypes.func,
-        removeValidate: PropTypes.func,
-        required: PropTypes.bool,
-        allowUserDefinedValue: PropTypes.bool,
-        limitOptions: PropTypes.bool,
-    };
+interface PropTypes {
+    name: string;
+    onChange: (name: string, value: string) => void,
+    label: string;
+    theme: Theme;
+    options: ProjectSelection[],
+    isLoading: boolean;
+    value?: ProjectSelection;
+    addValidate: (key: string, validateField: () => boolean) => void;
+    removeValidate: (key: string) => void;
+    required: boolean;
+    limitOptions: Boolean;
+};
 
-    constructor(props) {
+interface StateTypes {
+    invalid: boolean;
+}
+
+export default class ReactSelectSetting extends PureComponent<PropTypes, StateTypes> {
+    constructor(props: PropTypes) {
         super(props);
-
         this.state = {invalid: false};
     }
 
@@ -51,26 +50,22 @@ export default class ReactSelectSetting extends React.PureComponent {
     }
 
     componentDidUpdate() {
-        if(this.state.invalid)
+        if (this.state.invalid) {
             this.isValid();
+        }
     }
 
-    handleChange = (value) => {
-        if (this.props.onChange) {
-            if (Array.isArray(value)) {
-                this.props.onChange(this.props.name, value.map((x) => x.value));
-            } else {
-                const newValue = value ? value.value : null;
-                this.props.onChange(this.props.name, newValue);
-            }
-        }
+    handleChange = (value: SingleValue<ProjectSelection>) => {             
+        const newValue = value?.value ?? '';
+        this.props.onChange(this.props.name, newValue);
     };
 
-    filterOptions = (input) => {
+    filterOptions = (input: string) => {
         let options = this.props.options;
         if (input) {
             options = options.filter((x) => x.label.toLowerCase().includes(input.toLowerCase()));
         }
+
         return Promise.resolve(options.slice(0, MAX_NUM_OPTIONS));
     };
 
@@ -95,6 +90,7 @@ export default class ReactSelectSetting extends React.PureComponent {
                 </p>
             );
         }
+
         let selectComponent = null;
         if (this.props.limitOptions && this.props.options.length > MAX_NUM_OPTIONS) {
             // The parent component has let us know that we may have a large number of options, and that
@@ -102,7 +98,6 @@ export default class ReactSelectSetting extends React.PureComponent {
             // this.filterOptions() to limit the number of options being rendered at a given time.
             selectComponent = (
                 <AsyncSelect
-                    {...this.props}
                     loadOptions={this.filterOptions}
                     defaultOptions={true}
                     menuPortalTarget={document.body}
@@ -115,7 +110,7 @@ export default class ReactSelectSetting extends React.PureComponent {
         } else {
             selectComponent = (
                 <ReactSelect
-                    {...this.props}
+                    options={this.props.options}
                     menuPortalTarget={document.body}
                     menuPlacement='auto'
                     isLoading={this.props.isLoading}
@@ -130,8 +125,10 @@ export default class ReactSelectSetting extends React.PureComponent {
                 inputId={this.props.name}
                 {...this.props}
             >
-                {selectComponent}
-                {validationError}
+                <>
+                    {selectComponent}
+                    {validationError}
+                </>
             </Setting>
         );
     }

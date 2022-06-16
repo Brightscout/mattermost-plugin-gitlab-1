@@ -3,7 +3,7 @@ export interface Milestone{
     title: string;
 }
 
-export interface Selection{
+export interface MilestoneSelection{
     value: number;
     label: string;
 }

@@ -3,7 +3,7 @@ export interface Assignee{
     username: string;
 }
 
-export interface Selection{
+export interface AssigneeSelection{
     value: number;
     label: string;
 }

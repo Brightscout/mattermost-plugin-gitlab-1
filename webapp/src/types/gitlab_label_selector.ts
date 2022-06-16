@@ -2,7 +2,7 @@ export interface Label{
     name: string;
 }
 
-export interface Selection{
+export interface LabelSelection{
     value: string;
     label: string;
 }

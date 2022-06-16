@@ -15,5 +15,5 @@ export default {
     OPEN_CREATE_ISSUE_MODAL: `${id}_open_create_modal`,
     OPEN_CREATE_ISSUE_MODAL_WITHOUT_POST: `${id}_open_create_modal_without_post`,
     CLOSE_CREATE_ISSUE_MODAL: `${id}_close_create_modal`,
-    RECEIVED_REPOSITORIES: `${id}_received_repositories`,
+    RECEIVED_PROJECTS: `${id}_received_projects`,
 };

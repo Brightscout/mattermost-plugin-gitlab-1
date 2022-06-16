@@ -39,23 +39,23 @@ export default class Client {
     };
 
     createIssue = async (payload) => {
-        return this.doPost(`${this.url}/createissue`, payload);
+        return this.doPost(`${this.url}/issue`, payload);
     }
 
     getProjects = async () => {
         return this.doGet(`${this.url}/projects`);
     }
 
-    getLabels = async (pid) => {
-        return this.doGet(`${this.url}/labels?pid=${pid}`);
+    getLabels = async (projectID) => {
+        return this.doGet(`${this.url}/labels?projectID=${projectID}`);
     }
 
-    getMilestones = async (pid) => {
-        return this.doGet(`${this.url}/milestones?pid=${pid}`);
+    getMilestones = async (projectID) => {
+        return this.doGet(`${this.url}/milestones?projectID=${projectID}`);
     }
 
-    getAssignees = async (pid) => {
-        return this.doGet(`${this.url}/assignees?pid=${pid}`);
+    getAssignees = async (projectID) => {
+        return this.doGet(`${this.url}/assignees?projectID=${projectID}`);
     }
 
     doGet = async (url, body, headers = {}) => {

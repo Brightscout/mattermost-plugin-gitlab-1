@@ -1,17 +1,55 @@
 import React, {PureComponent} from 'react';
-import PropTypes from 'prop-types';
 import {Modal} from 'react-bootstrap';
+import {Theme} from 'mattermost-redux/types/preferences';
 
-import GitlabLabelSelector from 'components/gitlab_label_selector';
-import GitlabAssigneeSelector from 'components/gitlab_assignee_selector';
-import GitlabMilestoneSelector from 'components/gitlab_milestone_selector';
-import GitlabProjectSelector from 'components/gitlab_project_selector';
-import Validator from 'components/validator';
-import FormButton from 'components/form_button';
-import Input from 'components/input';
-import {getErrorMessage} from 'utils/user_utils';
+import GitlabLabelSelector from '../../gitlab_label_selector';
+import GitlabAssigneeSelector from '../../gitlab_assignee_selector';
+import GitlabMilestoneSelector from '../../gitlab_milestone_selector';
+import GitlabProjectSelector from '../../gitlab_project_selector';
+import Validator from '../../validator';
+import FormButton from '../../form_button';
+import Input from '../../input';
+import {getErrorMessage} from '../../../utils/user_utils';
+import {Post} from 'mattermost-redux/types/posts';
+import {LabelSelection} from 'src/types/gitlab_label_selector';
+import {AssigneeSelection} from 'src/types/gitlab_assignee_selector';
+import {MilestoneSelection} from 'src/types/gitlab_milestone_selector';
+import {ProjectSelection as Project } from 'src/types/gitlab_project_selector';
 
 const MAX_TITLE_LENGTH = 256;
+
+interface PropTypes {
+    post: Post | null,
+    title: string,
+    channelId: string,
+    theme: Theme,
+    visible: boolean,
+    actions: {
+        close: () => {
+            type: string;
+        };
+        create: (payload: any) => Promise<{
+            error: any;
+            data?: undefined;
+        } | {
+            data: any;
+            error?: undefined;
+        }>;
+    }
+};
+
+interface StateTypes {
+    submitting: boolean;
+    error: string | null;
+    project: Project | null;
+    issueTitle: string;
+    issueDescription: string;
+    labels: LabelSelection[];
+    assignees: AssigneeSelection[];
+    milestone: null | MilestoneSelection;
+    showErrors: boolean;
+    issueTitleValid: boolean;
+}
 
 const initialState = {
     submitting: false,
@@ -26,36 +64,26 @@ const initialState = {
     issueTitleValid: true,
 };
 
-export default class CreateIssueModal extends PureComponent {
-    static propTypes = {
-        post: PropTypes.object,
-        title: PropTypes.string,
-        channelId: PropTypes.string,
-        theme: PropTypes.object.isRequired,
-        visible: PropTypes.bool.isRequired,
-        actions: PropTypes.shape({
-            close: PropTypes.func.isRequired,
-            create: PropTypes.func.isRequired,
-        }).isRequired,
-    };
+export default class CreateIssueModal extends PureComponent<PropTypes, StateTypes> {
+    validator: Validator
 
-    constructor(props) {
+    constructor(props: PropTypes) {
         super(props);
         this.state = initialState;
         this.validator = new Validator();
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: PropTypes) {
         if (this.props.post && !prevProps.post) {
-            this.setState({issueDescription: this.props.post.message}); //eslint-disable-line react/no-did-update-set-state
+            this.setState({issueDescription: this.props.post.message});
         } else if (this.props.channelId && (this.props.channelId !== prevProps.channelId || this.props.title !== prevProps.title)) {
             const title = this.props.title.substring(0, MAX_TITLE_LENGTH);
-            this.setState({issueTitle: title}); // eslint-disable-line react/no-did-update-set-state
+            this.setState({issueTitle: title});
         }
     }
 
     // handle issue creation after form is populated
-    handleCreate = async (e) => {
+    handleCreate = async (e: React.FormEvent<HTMLFormElement> | Event) => {
         e.preventDefault();
 
         if (!this.validator.validate() || !this.state.issueTitle) {
@@ -91,61 +119,71 @@ export default class CreateIssueModal extends PureComponent {
                 submitting: false,
             });
             return;
-        }
-        this.handleClose(e);
+        }  
+
+        this.handleClose();
     };
 
-    handleClose = (e) => {
-        e.preventDefault();
-        this.setState(initialState, this.props.actions.close);
-    };
+    handleClose = () => {this.setState(initialState, this.props.actions.close);};
 
-    handleProjectChange = (project) => this.setState({project});
+    handleProjectChange = (project: Project) => this.setState({project});
 
-    handleLabelsChange = (labels) => this.setState({labels});
+    handleLabelsChange = (labels: LabelSelection[]) => this.setState({labels});
 
-    handleAssigneesChange = (assignees) => this.setState({assignees});
+    handleAssigneesChange = (assignees: AssigneeSelection[]) => this.setState({assignees});
 
-    handleMilestoneChange = (milestone) => this.setState({milestone});
+    handleMilestoneChange = (milestone: MilestoneSelection) => this.setState({milestone});
 
-    handleIssueTitleChange = (issueTitle) => {
+    handleIssueTitleChange = (issueTitle: string) => {
         this.setState({issueTitle});
         if (issueTitle && !this.state.issueTitleValid) {
             this.setState({issueTitleValid: true});
         }
     };
 
-    handleIssueDescriptionChange = (issueDescription) => this.setState({issueDescription});
+    handleIssueDescriptionChange = (issueDescription: string) => this.setState({issueDescription});
 
     renderIssueAttributeSelectors = () => {
         if (!this.state.project) {
             return null;
         }
 
+        const dropdownProps = {
+            projectID: this.state.project.project_id,
+            projectName: this.state.project.name,
+            theme: this.props.theme,
+        }
+
+        const labelProps = {
+            selectedLabels: this.state.labels,
+            onChange: this.handleLabelsChange,
+        }
+
+        const assigneeProps = {
+            selectedAssignees: this.state.assignees,
+            onChange: this.handleAssigneesChange,
+        }
+
+        const milestoneProps = {
+            selectedMilestone: this.state.milestone,
+            onChange: this.handleMilestoneChange,
+        }
+
         return (
             <>
                 <GitlabLabelSelector
-                    projectID={this.state.project?.project_id}
-                    projectName={this.state.project.name}
-                    theme={this.props.theme}
-                    selectedLabels={this.state.labels}
-                    onChange={this.handleLabelsChange}
+                    {...dropdownProps}
+                    {...labelProps}
                 />
 
                 <GitlabAssigneeSelector
-                    projectID={this.state.project?.project_id}
-                    projectName={this.state.project.name}
-                    theme={this.props.theme}
-                    selectedAssignees={this.state.assignees}
-                    onChange={this.handleAssigneesChange}
+                    {...dropdownProps}
+                    {...assigneeProps}
                 />
 
                 <GitlabMilestoneSelector
-                    projectID={this.state.project?.project_id}
-                    projectName={this.state.project.name}
-                    theme={this.props.theme}
-                    selectedMilestone={this.state.milestone}
-                    onChange={this.handleMilestoneChange}
+                    {...dropdownProps}
+                    {...milestoneProps}
                 />
             </>
         );
@@ -161,29 +199,24 @@ export default class CreateIssueModal extends PureComponent {
         const style = getStyle(theme);
 
         const requiredMsg = 'This field is required.';
-        let issueTitleValidationError = null;
-        if (this.state.showErrors && !this.state.issueTitleValid) {
-            issueTitleValidationError = (
-                <p className='help-text error-text'>
-                    <span>{requiredMsg}</span>
-                </p>
-            );
-        }
+        const issueTitleValidationError = (this.state.showErrors && !this.state.issueTitleValid) ? (
+            <p className='help-text error-text'>
+                <span>{requiredMsg}</span>
+            </p>
+        ) : null;
 
-        let submitError = null;
-        if (error) {
-            submitError = (
-                <p className='help-text error-text'>
-                    <span>{error}</span>
-                </p>
-            );
-        }
+        const submitError = error ? (
+            <p className='help-text error-text'>
+                <span>{error}</span>
+            </p>
+        ) : null;
+        
 
         const component = (
             <div>
                 <GitlabProjectSelector
                     onChange={this.handleProjectChange}
-                    value={this.state.project && this.state.project.name}
+                    value={this.state.project?.name}
                     required={true}
                     theme={theme}
                     addValidate={this.validator.addComponent}
@@ -205,6 +238,8 @@ export default class CreateIssueModal extends PureComponent {
                 {this.renderIssueAttributeSelectors()}
 
                 <Input
+                    id={'description'}
+                    required={false}
                     label='Issue description'
                     type='textarea'
                     value={this.state.issueDescription}
@@ -233,7 +268,6 @@ export default class CreateIssueModal extends PureComponent {
                 >
                     <Modal.Body
                         style={style.modal}
-                        ref='modalBody'
                     >
                         {component}
                     </Modal.Body>
@@ -259,7 +293,7 @@ export default class CreateIssueModal extends PureComponent {
     }
 }
 
-const getStyle = (theme) => ({
+const getStyle = (theme: Theme) => ({
     modal: {
         padding: '2em 2em 3em',
         color: theme.centerChannelColor,

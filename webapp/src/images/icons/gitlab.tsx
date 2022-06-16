@@ -4,22 +4,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default class GitLabIcon extends React.PureComponent {
-    static propTypes = {
-        type: PropTypes.oneOf([
-            'menu',
-        ]),
-    };
+interface PropTypes {
+    type: string;
+}
 
-    static defaultProps = {
-        type: 'menu',
-    };
-
+export default class GitLabIcon extends React.PureComponent<PropTypes> {
     render() {
-        let iconStyle = {};
-        if (this.props.type === 'menu') {
-            iconStyle = {flex: '0 0 auto', width: '20px', height: '20px', borderRadius: '50px', padding: '2px'};
-        }
+        let iconStyle = (this.props.type === 'menu') ? {flex: '0 0 auto', width: '20px', height: '20px', borderRadius: '50px', padding: '2px'} : {};
 
         return (
             <span className='MenuItem__icon'>

@@ -194,7 +194,7 @@ const createIssueModal = (state = '', action) => {
 
 function yourProjects(state = [], action) {
     switch (action.type) {
-    case ActionTypes.RECEIVED_REPOSITORIES:
+    case ActionTypes.RECEIVED_PROJECTS:
         return action.data;
     default:
         return state;

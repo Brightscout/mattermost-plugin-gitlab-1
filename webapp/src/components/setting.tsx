@@ -1,28 +1,18 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, {PureComponent} from 'react';
 
-export default class Setting extends React.PureComponent {
-    static propTypes = {
-        inputId: PropTypes.string,
-        label: PropTypes.node,
-        children: PropTypes.node.isRequired,
-        helpText: PropTypes.node,
-        required: PropTypes.bool,
-        hideRequiredStar: PropTypes.bool,
-    };
+interface PropTypes {
+    inputId?: string;
+    label?: string;
+    children?: JSX.Element | null;
+    required?: boolean;
+};
 
+export default class Setting extends PureComponent<PropTypes> {
     render() {
-        const {
-            children,
-            helpText,
-            inputId,
-            label,
-            required,
-            hideRequiredStar,
-        } = this.props;
+        const {children, inputId, label, required} = this.props;
 
         return (
             <div className='form-group less'>
@@ -34,7 +24,7 @@ export default class Setting extends React.PureComponent {
                         {label}
                     </label>)
                 }
-                {required && !hideRequiredStar && (
+                {required && (
                     <span
                         className='error-text'
                         style={{marginLeft: '3px'}}
@@ -45,9 +35,6 @@ export default class Setting extends React.PureComponent {
                 }
                 <div>
                     {children}
-                    <p className='help-text'>
-                        {helpText}
-                    </p>
                 </div>
             </div>
         );

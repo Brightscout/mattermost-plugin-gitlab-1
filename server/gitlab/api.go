@@ -27,6 +27,18 @@ type PRDetails struct {
 	ProjectID int                           `json:"project_id"`
 }
 
+type IssueRequest struct {
+	ID          int                 `json:"id"`
+	Title       string              `json:"title"`
+	Description string              `json:"description"`
+	Milestone   int                 `json:"milestone"`
+	ProjectID   int                 `json:"project_id"`
+	Assignees   []int               `json:"assignees"`
+	Labels      internGitlab.Labels `json:"labels"`
+	PostID      string              `json:"post_id"`
+	ChannelID   string              `json:"channel_id"`
+}
+
 type MergeRequest struct {
 	*internGitlab.MergeRequest
 	LabelsWithDetails []*internGitlab.Label `json:"labels_with_details,omitempty"`
@@ -290,15 +302,14 @@ func (g *gitlab) GetYourProjects(ctx context.Context, user *UserInfo) ([]*intern
 	return result, nil
 }
 
-func (g *gitlab) GetLabels(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.Label, error) {
+func (g *gitlab) GetLabels(ctx context.Context, user *UserInfo, projectID string) ([]*internGitlab.Label, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
 		return nil, err
 	}
-	var projectID interface{} = pid
 	result, resp, err := client.Labels.ListLabels(
 		projectID,
-		&internGitlab.ListLabelsOptions{},
+		nil,
 		internGitlab.WithContext(ctx),
 	)
 	if respErr := checkResponse(resp); respErr != nil {
@@ -311,15 +322,14 @@ func (g *gitlab) GetLabels(ctx context.Context, user *UserInfo, pid string) ([]*
 	return result, nil
 }
 
-func (g *gitlab) GetMilestones(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.Milestone, error) {
+func (g *gitlab) GetMilestones(ctx context.Context, user *UserInfo, projectID string) ([]*internGitlab.Milestone, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
 		return nil, err
 	}
-	var projectID interface{} = pid
 	result, resp, err := client.Milestones.ListMilestones(
 		projectID,
-		&internGitlab.ListMilestonesOptions{},
+		nil,
 		internGitlab.WithContext(ctx),
 	)
 	if respErr := checkResponse(resp); respErr != nil {
@@ -332,15 +342,14 @@ func (g *gitlab) GetMilestones(ctx context.Context, user *UserInfo, pid string) 
 	return result, nil
 }
 
-func (g *gitlab) GetAssignees(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.ProjectMember, error) {
+func (g *gitlab) GetAssignees(ctx context.Context, user *UserInfo, projectID string) ([]*internGitlab.ProjectMember, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
 		return nil, err
 	}
-	var projectID interface{} = pid
 	result, resp, err := client.ProjectMembers.ListProjectMembers(
 		projectID,
-		&internGitlab.ListProjectMembersOptions{},
+		nil,
 		internGitlab.WithContext(ctx),
 	)
 	if respErr := checkResponse(resp); respErr != nil {
@@ -619,27 +628,14 @@ func (g *gitlab) GetUnreads(ctx context.Context, user *UserInfo) ([]*internGitla
 	return notifications, nil
 }
 
-type IssueRequest struct {
-	ID          int                 `json:"id"`
-	Title       string              `json:"title"`
-	Description string              `json:"description"`
-	Milestone   int                 `json:"milestone"`
-	ProjectID   int                 `json:"project_id"`
-	Assignees   []int               `json:"assignees"`
-	Labels      internGitlab.Labels `json:"labels"`
-	PostID      string              `json:"post_id"`
-	ChannelID   string              `json:"channel_id"`
-}
-
 func (g *gitlab) CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRequest) (*internGitlab.Issue, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
 		return nil, err
 	}
-	var pid interface{} = issue.ProjectID
 
 	result, resp, err := client.Issues.CreateIssue(
-		pid,
+		issue.ProjectID,
 		&internGitlab.CreateIssueOptions{
 			Title:       &issue.Title,
 			Description: &issue.Description,
@@ -653,7 +649,7 @@ func (g *gitlab) CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRe
 		return nil, respErr
 	}
 	if err != nil {
-		return nil, errors.Wrap(err, "can't create issue in GitLab api")
+		return nil, errors.Wrap(err, "can't create issue in GitLab")
 	}
 	return result, nil
 }
