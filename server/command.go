@@ -143,14 +143,6 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		return &model.CommandResponse{}, nil
 	}
 
-	if action == "issue" {
-		message := p.handleIssue(c, args, parameters)
-		if message != "" {
-			p.postCommandResponse(args, message)
-		}
-		return &model.CommandResponse{}, nil
-	}
-
 	config := p.getConfiguration()
 
 	if err := config.IsValid(); err != nil {
@@ -224,6 +216,12 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 			return p.getCommandResponse(args, "Encountered an error getting your to do items."), nil
 		}
 		return p.getCommandResponse(args, text), nil
+	case "issue":
+		message := p.handleIssue(c, args, parameters)
+		if message != "" {
+			p.postCommandResponse(args, message)
+		}
+		return &model.CommandResponse{}, nil
 	case "me":
 		gitUser, err := p.GitlabClient.GetUserDetails(ctx, info)
 		if err != nil {
@@ -657,8 +655,8 @@ func getAutocompleteData(config *configuration) *model.AutocompleteData {
 	issue := model.NewAutocompleteData("issue", "[command]", "Available commands: create")
 	gitlab.AddCommand(issue)
 
-	create := model.NewAutocompleteData("create", "[title]", "Open a dialog to create a new issue in Gitlab, using the title is provided")
-	issue.AddCommand(create)
+	issueCreate := model.NewAutocompleteData("create", "[title]", "Open a dialog to create a new issue in Gitlab, using the title if provided")
+	issue.AddCommand(issueCreate)
 
 	subscriptions := model.NewAutocompleteData("subscriptions", "[command]", "Available commands: Add, List, Delete")
 

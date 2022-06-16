@@ -5,50 +5,55 @@ import React, {PureComponent} from 'react';
 import {Theme} from 'mattermost-redux/types/preferences';
 
 import IssueAttributeSelector from '../issue_attribute_selector';
-import {Label, Selection} from '../../types/gitlab_label_selector'
+import {Label, LabelSelection} from '../../types/gitlab_label_selector'
 
-interface PropTypes{
-    projectID: number;
+interface PropTypes {
+    projectID?: number;
     projectName: string;
     theme: Theme;
-    selectedLabels: Selection[];
-    onChange: (labels: Selection) => void;
-    actions: any;
+    selectedLabels: LabelSelection[];
+    onChange: (labels: LabelSelection[]) => void;
+    actions: {
+        getLabelOptions: (projectID: any) =>  Promise<{
+            error: any;
+            data?: undefined;
+        } | {
+            data: any;
+            error?: undefined;
+        }>
+    };
 };
 
-export default class GitlabLabelSelector extends PureComponent<PropTypes> {
-   
+export default class GitlabLabelSelector extends PureComponent<PropTypes> { 
     loadLabels = async () => {
-        if (this.props.projectName === '') {
+        if (!this.props.projectName) {
             return [];
         }
+
         const options = await this.props.actions.getLabelOptions(this.props.projectID);
 
         if (options.error) {
-            throw new Error('Failed to load labels');
+            throw new Error('failed to load labels');
         }
 
         if (!options || !options.data) {
             return [];
         }
+
         return options.data.map((option: Label) => ({
             value: option.name,
             label: option.name,
         }));
     };
 
-    onChange = (selection: Selection) => this.props.onChange(selection);
-
     render() {
         return (
             <div className='form-group margin-bottom x3'>
-                <label className='control-label margin-bottom x2'>
-                    {'Labels'}
-                </label>
                 <IssueAttributeSelector
                     {...this.props}
+                    label='Labels'
                     isMulti={true}
-                    onChange={this.onChange}
+                    onChange={this.props.onChange}
                     selection={this.props.selectedLabels}
                     loadOptions={this.loadLabels}
                 />

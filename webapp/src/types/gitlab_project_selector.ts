@@ -1,6 +1,6 @@
-export interface Selection {
+export interface ProjectSelection {
     name: string;
-    project_id: number | undefined;
+    project_id?: number;
 }
 
 export interface Project{

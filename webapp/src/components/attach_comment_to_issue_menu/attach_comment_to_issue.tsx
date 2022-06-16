@@ -1,26 +1,29 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React, {PureComponent} from 'react';
+import React, {PureComponent, MouseEvent} from 'react';
 import PropTypes from 'prop-types';
 
 import GitLabIcon from 'src/images/icons/gitlab';
 
-export default class AttachCommentToIssuePostMenuAction extends PureComponent {
-    static propTypes = {
-        open: PropTypes.func.isRequired,
-        postId: PropTypes.string,
-        show: PropTypes.bool.isRequired,
+interface PropTypes {
+    postId: string;
+    show: boolean;
+    actions: {
+        open: (postId: any) => {
+            type: string;
+            data: {
+                postId: any;
+            };
+        };
     };
+};
 
-    static defaultTypes = {
-        locale: 'en',
-    };
-
-    handleClick = (e) => {
-        const {open, postId} = this.props;
+export default class AttachCommentToIssuePostMenuAction extends PureComponent<PropTypes> {
+    handleClick = (e: MouseEvent<HTMLButtonElement> | Event) => {
+        const {postId} = this.props;
         e.preventDefault();
-        open(postId);
+        this.props.actions.open(postId);
     };
 
     render() {

@@ -356,7 +356,7 @@ export function getProjects() {
         try {
             data = await Client.getProjects();
         } catch (error) {
-            return {error: data};
+            return {error};
         }
 
         const connected = await checkAndHandleNotConnected(data)(dispatch, getState);
@@ -365,7 +365,7 @@ export function getProjects() {
         }
 
         dispatch({
-            type: ActionTypes.RECEIVED_REPOSITORIES,
+            type: ActionTypes.RECEIVED_PROJECTS,
             data,
         });
 
@@ -373,11 +373,11 @@ export function getProjects() {
     };
 }
 
-export function getLabelOptions(pid) {
+export function getLabelOptions(projectID) {
     return async (dispatch, getState) => {
         let data;
         try {
-            data = await Client.getLabels(pid);
+            data = await Client.getLabels(projectID);
         } catch (error) {
             return {error};
         }
@@ -391,11 +391,11 @@ export function getLabelOptions(pid) {
     };
 }
 
-export function getMilestoneOptions(pid) {
+export function getMilestoneOptions(projectID) {
     return async (dispatch, getState) => {
         let data;
         try {
-            data = await Client.getMilestones(pid);
+            data = await Client.getMilestones(projectID);
         } catch (error) {
             return {error};
         }
@@ -409,11 +409,11 @@ export function getMilestoneOptions(pid) {
     };
 }
 
-export function getAssigneeOptions(pid) {
+export function getAssigneeOptions(projectID) {
     return async (dispatch, getState) => {
         let data;
         try {
-            data = await Client.getAssignees(pid);
+            data = await Client.getAssignees(projectID);
         } catch (error) {
             return {error};
         }

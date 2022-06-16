@@ -305,15 +305,14 @@ func (g *gitlab) GetYourProjects(ctx context.Context, user *UserInfo) ([]*intern
 	return result, nil
 }
 
-func (g *gitlab) GetLabels(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.Label, error) {
+func (g *gitlab) GetLabels(ctx context.Context, user *UserInfo, projectID string) ([]*internGitlab.Label, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
 		return nil, err
 	}
-	var projectID interface{} = pid
 	result, resp, err := client.Labels.ListLabels(
 		projectID,
-		&internGitlab.ListLabelsOptions{},
+		nil,
 		internGitlab.WithContext(ctx),
 	)
 	if respErr := checkResponse(resp); respErr != nil {
@@ -326,15 +325,14 @@ func (g *gitlab) GetLabels(ctx context.Context, user *UserInfo, pid string) ([]*
 	return result, nil
 }
 
-func (g *gitlab) GetMilestones(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.Milestone, error) {
+func (g *gitlab) GetMilestones(ctx context.Context, user *UserInfo, projectID string) ([]*internGitlab.Milestone, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
 		return nil, err
 	}
-	var projectID interface{} = pid
 	result, resp, err := client.Milestones.ListMilestones(
 		projectID,
-		&internGitlab.ListMilestonesOptions{},
+		nil,
 		internGitlab.WithContext(ctx),
 	)
 	if respErr := checkResponse(resp); respErr != nil {
@@ -347,15 +345,14 @@ func (g *gitlab) GetMilestones(ctx context.Context, user *UserInfo, pid string) 
 	return result, nil
 }
 
-func (g *gitlab) GetAssignees(ctx context.Context, user *UserInfo, pid string) ([]*internGitlab.ProjectMember, error) {
+func (g *gitlab) GetAssignees(ctx context.Context, user *UserInfo, projectID string) ([]*internGitlab.ProjectMember, error) {
 	client, err := g.gitlabConnect(*user.Token)
 	if err != nil {
 		return nil, err
 	}
-	var projectID interface{} = pid
 	result, resp, err := client.ProjectMembers.ListProjectMembers(
 		projectID,
-		&internGitlab.ListProjectMembersOptions{},
+		nil,
 		internGitlab.WithContext(ctx),
 	)
 	if respErr := checkResponse(resp); respErr != nil {
@@ -655,7 +652,7 @@ func (g *gitlab) CreateIssue(ctx context.Context, user *UserInfo, issue *IssueRe
 		return nil, respErr
 	}
 	if err != nil {
-		return nil, errors.Wrap(err, "can't create issue in GitLab api")
+		return nil, errors.Wrap(err, "can't create issue in GitLab")
 	}
 	return result, nil
 }

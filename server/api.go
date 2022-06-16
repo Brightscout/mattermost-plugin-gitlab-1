@@ -56,8 +56,8 @@ func (p *Plugin) initializeAPI() {
 	apiRouter.HandleFunc("/reviews", p.checkAuth(p.attachUserContext(p.getReviews), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/yourprs", p.checkAuth(p.attachUserContext(p.getYourPrs), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/prdetails", p.checkAuth(p.attachUserContext(p.getPrDetails), ResponseTypePlain)).Methods(http.MethodPost)
-	apiRouter.HandleFunc("/createissue", p.checkAuth(p.attachUserContext(p.createIssue), ResponseTypePlain)).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/attachcommenttoissue", p.checkAuth(p.attachUserContext(p.attachCommentToIssue), ResponseTypePlain)).Methods(http.MethodPost)
+	apiRouter.HandleFunc("/issue", p.checkAuth(p.attachUserContext(p.createIssue), ResponseTypePlain)).Methods(http.MethodPost)
 	apiRouter.HandleFunc("/yourassignments", p.checkAuth(p.attachUserContext(p.getYourAssignments), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/unreads", p.checkAuth(p.attachUserContext(p.getUnreads), ResponseTypePlain)).Methods(http.MethodGet)
 	apiRouter.HandleFunc("/projects", p.checkAuth(p.attachUserContext(p.getYourProjects), ResponseTypePlain)).Methods(http.MethodGet)
@@ -582,8 +582,8 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 	}
 
 	var post *model.Post
-	permalink := ""
 	var appErr *model.AppError
+	permalink := ""
 	if issue.PostID != "" {
 		post, appErr = p.API.GetPost(issue.PostID)
 		if appErr != nil {
@@ -599,8 +599,8 @@ func (p *Plugin) createIssue(c *UserContext, w http.ResponseWriter, r *http.Requ
 
 	result, err := p.GitlabClient.CreateIssue(c.Ctx, c.GitlabInfo, issue)
 	if err != nil {
-		c.Log.WithError(err).Warnf("Can't create issue in GitLab API")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Unable to create issue in GitLab API. Error: %s", err.Error()), StatusCode: http.StatusInternalServerError})
+		c.Log.WithError(err).Warnf("Can't create issue in GitLab")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: fmt.Sprintf("Unable to create issue in GitLab. Error: %s", err.Error()), StatusCode: http.StatusInternalServerError})
 		return
 	}
 
@@ -748,11 +748,11 @@ func (p *Plugin) getYourProjects(c *UserContext, w http.ResponseWriter, r *http.
 }
 
 func (p *Plugin) getLabels(c *UserContext, w http.ResponseWriter, r *http.Request) {
-	pid := r.URL.Query().Get("pid")
-	result, err := p.GitlabClient.GetLabels(c.Ctx, c.GitlabInfo, pid)
+	projectID := r.URL.Query().Get("projectID")
+	result, err := p.GitlabClient.GetLabels(c.Ctx, c.GitlabInfo, projectID)
 	if err != nil {
-		c.Log.WithError(err).Warnf("can't list labels of project in GitLab API")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "unable to list labels in GitLab API.", StatusCode: http.StatusInternalServerError})
+		c.Log.WithError(err).Warnf("Can't list labels of project in GitLab")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to list labels in GitLab.", StatusCode: http.StatusInternalServerError})
 		return
 	}
 
@@ -760,11 +760,11 @@ func (p *Plugin) getLabels(c *UserContext, w http.ResponseWriter, r *http.Reques
 }
 
 func (p *Plugin) getMilestones(c *UserContext, w http.ResponseWriter, r *http.Request) {
-	pid := r.URL.Query().Get("pid")
-	result, err := p.GitlabClient.GetMilestones(c.Ctx, c.GitlabInfo, pid)
+	projectID := r.URL.Query().Get("projectID")
+	result, err := p.GitlabClient.GetMilestones(c.Ctx, c.GitlabInfo, projectID)
 	if err != nil {
-		c.Log.WithError(err).Warnf("can't list milestones of project in GitLab API")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "unable to list milestones in GitLab API.", StatusCode: http.StatusInternalServerError})
+		c.Log.WithError(err).Warnf("Can't list milestones of project in GitLab")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to list milestones in GitLab.", StatusCode: http.StatusInternalServerError})
 		return
 	}
 
@@ -772,11 +772,11 @@ func (p *Plugin) getMilestones(c *UserContext, w http.ResponseWriter, r *http.Re
 }
 
 func (p *Plugin) getAssignees(c *UserContext, w http.ResponseWriter, r *http.Request) {
-	pid := r.URL.Query().Get("pid")
-	result, err := p.GitlabClient.GetAssignees(c.Ctx, c.GitlabInfo, pid)
+	projectID := r.URL.Query().Get("projectID")
+	result, err := p.GitlabClient.GetAssignees(c.Ctx, c.GitlabInfo, projectID)
 	if err != nil {
-		c.Log.WithError(err).Warnf("can't list assignees of the project in GitLab API")
-		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "unable to list assignees in GitLab API.", StatusCode: http.StatusInternalServerError})
+		c.Log.WithError(err).Warnf("Can't list assignees of the project in GitLab")
+		p.writeAPIError(w, &APIErrorResponse{ID: "", Message: "Unable to list assignees in GitLab.", StatusCode: http.StatusInternalServerError})
 		return
 	}
 

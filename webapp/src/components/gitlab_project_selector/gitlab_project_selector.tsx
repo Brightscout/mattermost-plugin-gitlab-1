@@ -4,22 +4,32 @@
 import React, {PureComponent} from 'react';
 import {Theme} from 'mattermost-redux/types/preferences';
 
+import {Project, ProjectSelection as Selection} from '../../types/gitlab_project_selector'
+import {LabelSelection as ProjectSelection} from '../../types/gitlab_label_selector'
 import ReactSelectSetting from '../react_select_setting';
-import {Project, Selection} from '../../types/gitlab_project_selector'
 
-interface PropTypes{
+interface PropTypes {
     yourProjects: Project[];
     theme: Theme;
+    required: boolean;
     onChange: (project: Selection) => void;
-    actions: any;
-    value: string;
+    actions: {
+        getProjects: () => Promise<{
+            error: any;
+            data?: undefined;
+        } | {
+            data: any;
+            error?: undefined;
+        }>;
+    };
+    value?: string;
     addValidate: (key: string, validateField: () => boolean) => void;
     removeValidate: (key: string) => void;
 };
 
-interface StateTypes{
+interface StateTypes {
     invalid: boolean;
-    error: null|string;
+    error: null | string;
     isLoading: boolean;
 }
 
@@ -29,8 +39,7 @@ const initialState = {
     isLoading: false,
 };
 
-export default class GitlabProjectSelector extends PureComponent<PropTypes, StateTypes> {
-    
+export default class GitlabProjectSelector extends PureComponent<PropTypes, StateTypes> { 
     constructor(props: PropTypes) {
         super(props);
         this.state = initialState;
@@ -40,7 +49,7 @@ export default class GitlabProjectSelector extends PureComponent<PropTypes, Stat
         this.loadProjects();
     }
 
-    loadProjects = async ()=>{
+    loadProjects = async () => {
         this.setState({isLoading:true})
         await this.props.actions.getProjects();
         this.setState({isLoading:false});
@@ -53,6 +62,7 @@ export default class GitlabProjectSelector extends PureComponent<PropTypes, Stat
 
     render() {
         const projectOptions = this.props.yourProjects.map((item: Project) => ({value: item.path_with_namespace, label: item.path_with_namespace}));
+        
         return (
             <div className={'form-group margin-bottom x3'}>
                 <ReactSelectSetting
@@ -62,13 +72,12 @@ export default class GitlabProjectSelector extends PureComponent<PropTypes, Stat
                     required={true}
                     onChange={this.onChange}
                     options={projectOptions}
-                    isMulti={false}
                     key={'project'}
                     isLoading={this.state.isLoading}
                     theme={this.props.theme}
                     addValidate={this.props.addValidate}
                     removeValidate={this.props.removeValidate}
-                    value={projectOptions.find((option: any) => option.value === this.props.value)}
+                    value={projectOptions.find((option: ProjectSelection) => option.value === this.props.value)}
                 />
                 <div className={'help-text'}>
                     {'Returns GitLab projects connected to the user account'} <br/>
